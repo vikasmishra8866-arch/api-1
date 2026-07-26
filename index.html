@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Vehicle Lookup Gateway</title>
+  
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['"Plus Jakarta Sans"', 'sans-serif'],
+            mono: ['"JetBrains Mono"', 'monospace'],
+          },
+          colors: {
+            darkbg: '#06080d',
+            electric: '#06b6d4',
+            emeraldGlow: '#10b981',
+          },
+          animation: {
+            'pulse-glow': 'pulseGlow 2s infinite ease-in-out',
+            'shimmer': 'shimmer 1.5s infinite linear',
+          },
+          keyframes: {
+            pulseGlow: {
+              '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
+              '50%': { opacity: 0.8, transform: 'scale(1.05)' },
+            },
+            shimmer: {
+              '0%': { backgroundPosition: '-200% 0' },
+              '100%': { backgroundPosition: '200% 0' },
+            }
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body {
+      background-color: #06080d;
+      font-family: 'Plus Jakarta Sans', sans-serif;
+      color: #f8fafc;
+      overflow-x: hidden;
+      min-height: 100vh;
+    }
+
+    /* Radial glows for background */
+    .bg-glow-cyan {
+      background: radial-gradient(circle, rgba(6, 182, 212, 0.15) 0%, rgba(6, 8, 13, 0) 70%);
+    }
+    .bg-glow-emerald {
+      background: radial-gradient(circle, rgba(16, 185, 129, 0.12) 0%, rgba(6, 8, 13, 0) 70%);
+    }
+
+    /* Glassmorphism styling */
+    .glass-panel {
+      background: rgba(15, 23, 42, 0.6);
+      backdrop-filter: blur(24px);
+      -webkit-backdrop-filter: blur(24px);
+      border: 1px solid rgba(6, 182, 212, 0.2);
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    .glass-input {
+      background: rgba(6, 8, 13, 0.7);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      backdrop-filter: blur(12px);
+    }
+    .glass-input:focus-within {
+      border-color: #06b6d4;
+      box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+    }
+
+    /* Shimmer Skeleton */
+    .skeleton {
+      background: linear-gradient(90deg, rgba(255, 255, 255, 0.03) 25%, rgba(255, 255, 255, 0.08) 37%, rgba(255, 255, 255, 0.03) 63%);
+      background-size: 400% 100%;
+      animation: shimmer 1.4s ease infinite;
+    }
+
+    /* Custom Scrollbar */
+    ::-webkit-scrollbar {
+      width: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #06080d;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: rgba(6, 182, 212, 0.3);
+      border-radius: 4px;
+    }
+    ::-webkit-scrollbar-thumb:hover {
+      background: rgba(6, 182, 212, 0.6);
+    }
+  </style>
+</head>
+<body class="relative flex flex-col items-center justify-start min-h-screen p-4 sm:p-6 lg:p-8 antialiased selection:bg-cyan-500 selection:text-black">
+
+  <!-- Ambient Dynamic Background Light Glows -->
+  <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-glow-cyan pointer-events-none z-0 rounded-full animate-pulse-glow"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-glow-emerald pointer-events-none z-0 rounded-full animate-pulse-glow" style="animation-delay: 1s;"></div>
+
+  <!-- TOP CORNER SERVER STATUS INDICATOR -->
+  <div class="fixed top-5 right-5 z-50">
+    <div class="glass-panel py-2 px-3.5 rounded-full flex items-center space-x-2.5 shadow-lg border border-cyan-500/30 text-xs font-medium tracking-wide" title="Server 1 Gateway Status">
+      <span class="relative flex h-2.5 w-2.5">
+        <span id="status-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+        <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+      </span>
+      <span class="text-slate-300 font-mono text-[11px] uppercase tracking-wider">Server 1 Gateway</span>
+    </div>
+  </div>
+
+  <!-- MAIN CONTAINER HUB -->
+  <main class="w-full max-w-5xl z-10 flex flex-col items-center my-auto py-8">
+    
+    <!-- FLOATING SEARCH INTERFACE -->
+    <section class="w-full max-w-2xl mb-8">
+      <div class="glass-panel p-3 sm:p-4 rounded-3xl transition-all duration-300 hover:border-cyan-500/40">
+        <form id="search-form" onsubmit="handleSearch(event)" class="relative flex flex-col sm:flex-row items-center gap-3">
+          <div class="glass-input flex items-center w-full rounded-2xl px-4 py-3.5 transition-all">
+            <i data-lucide="search" class="w-5 h-5 text-cyan-400 mr-3 shrink-0"></i>
+            <input 
+              type="text" 
+              id="reg-input"
+              placeholder="ENTER VEHICLE NUMBER (E.G. MH01AB1234)" 
+              class="w-full bg-transparent text-white font-mono placeholder:font-sans placeholder-slate-500 font-bold uppercase tracking-wider focus:outline-none text-base sm:text-lg"
+              autocomplete="off"
+              spellcheck="false"
+              required
+            />
+            <button 
+              type="button" 
+              id="clear-btn" 
+              onclick="clearInput()" 
+              class="hidden text-slate-500 hover:text-slate-300 transition-colors p-1"
+            >
+              <i data-lucide="x" class="w-4 h-4"></i>
+            </button>
+          </div>
+
+          <button 
+            type="submit" 
+            id="search-btn"
+            class="w-full sm:w-auto px-8 py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 text-slate-950 font-extrabold rounded-2xl transition-all duration-300 hover:opacity-90 hover:shadow-[0_0_25px_rgba(6,182,212,0.5)] active:scale-95 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none flex items-center justify-center shrink-0 text-sm tracking-wide uppercase"
+          >
+            <span id="btn-text" class="flex items-center gap-2">
+              <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+              <span>Fetch</span>
+            </span>
+          </button>
+        </form>
+      </div>
+    </section>
+
+    <!-- SKELETON LOADER CONTAINER -->
+    <div id="skeleton-container" class="w-full space-y-6 hidden">
+      <!-- Hero Skeleton -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-4">
+        <div class="flex flex-wrap justify-between items-start gap-4">
+          <div class="space-y-3 w-2/3">
+            <div class="h-8 w-3/4 skeleton rounded-xl"></div>
+            <div class="h-6 w-1/3 skeleton rounded-lg"></div>
+          </div>
+          <div class="h-10 w-28 skeleton rounded-full"></div>
+        </div>
+        <div class="flex gap-2 pt-2">
+          <div class="h-6 w-20 skeleton rounded-md"></div>
+          <div class="h-6 w-20 skeleton rounded-md"></div>
+        </div>
+      </div>
+
+      <!-- Grid Cards Skeleton -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="glass-panel p-6 rounded-3xl space-y-4">
+          <div class="h-6 w-1/2 skeleton rounded-lg mb-6"></div>
+          <div class="space-y-3">
+            <div class="h-4 w-full skeleton rounded"></div>
+            <div class="h-4 w-5/6 skeleton rounded"></div>
+            <div class="h-4 w-2/3 skeleton rounded"></div>
+          </div>
+        </div>
+        <div class="glass-panel p-6 rounded-3xl space-y-4">
+          <div class="h-6 w-1/2 skeleton rounded-lg mb-6"></div>
+          <div class="space-y-3">
+            <div class="h-4 w-full skeleton rounded"></div>
+            <div class="h-4 w-5/6 skeleton rounded"></div>
+            <div class="h-4 w-2/3 skeleton rounded"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DATA NOT FOUND / ERROR CARD -->
+    <div id="error-card" class="w-full max-w-xl hidden">
+      <div class="glass-panel p-8 sm:p-10 rounded-3xl text-center border-amber-500/30 bg-amber-950/10 space-y-4">
+        <div class="inline-flex p-4 rounded-2xl bg-amber-500/10 text-amber-400 border border-amber-500/20 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+          <i data-lucide="alert-triangle" class="w-10 h-10"></i>
+        </div>
+        <h3 class="text-xl font-bold text-white tracking-tight">Records Unavailable</h3>
+        <p id="error-message" class="text-slate-400 text-sm max-w-md mx-auto leading-relaxed">
+          Data Not Found / Vehicle Records Unavailable on Server 1
+        </p>
+      </div>
+    </div>
+
+    <!-- DYNAMIC RESULTS DISPLAY CONTAINER -->
+    <div id="results-container" class="w-full space-y-6 hidden">
+
+      <!-- HERO BANNER CARD -->
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden border-cyan-500/30">
+        <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
+        
+        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+          <div class="space-y-3">
+            <div class="flex flex-wrap items-center gap-3">
+              <span id="hero-reg" class="font-mono text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-wider px-3.5 py-1 bg-cyan-950/50 border border-cyan-500/30 rounded-xl shadow-inner">
+                NA
+              </span>
+              <span id="hero-status" class="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+                ACTIVE
+              </span>
+            </div>
+            <h1 id="hero-title" class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
+              NA
+            </h1>
+          </div>
+
+          <div class="flex flex-wrap md:flex-col gap-2 items-start md:items-end justify-start">
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Class:</span>
+              <span id="hero-class" class="text-xs font-bold text-slate-200 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700">NA</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Fuel:</span>
+              <span id="hero-fuel" class="text-xs font-bold text-emerald-400 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/20">NA</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- DATA SECTIONS GRID -->
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+        <!-- CARD 1: Owner & Registration Details -->
+        <div class="glass-panel p-6 rounded-3xl space-y-5 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-800">
+            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <i data-lucide="user" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white tracking-wide">Owner & Registration</h2>
+          </div>
+
+          <div class="space-y-3.5 text-sm">
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Full Owner Name</span>
+              <span id="c1-owner" class="text-white font-semibold mt-0.5">NA</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Father's Name / Nominee</span>
+                <span id="c1-father" class="text-slate-200 mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Owner Serial Count</span>
+                <span id="c1-owner-count" class="text-slate-200 mt-0.5 font-mono">NA</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Registering Authority (RTO)</span>
+              <span id="c1-rto" class="text-slate-200 mt-0.5">NA</span>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Registration Date</span>
+                <span id="c1-reg-date" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">RC Expiry Date</span>
+                <span id="c1-rc-exp" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Communication Address</span>
+              <span id="c1-comm-addr" class="text-slate-300 text-xs mt-0.5 leading-relaxed">NA</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Permanent Address</span>
+              <span id="c1-perm-addr" class="text-slate-300 text-xs mt-0.5 leading-relaxed">NA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 2: Technical Specifications -->
+        <div class="glass-panel p-6 rounded-3xl space-y-5 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-800">
+            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <i data-lucide="cpu" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white tracking-wide">Technical Specifications</h2>
+          </div>
+
+          <div class="space-y-3.5 text-sm">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Engine Number</span>
+                <span id="c2-engine" class="text-slate-200 font-mono text-xs break-all mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Chassis Number</span>
+                <span id="c2-chassis" class="text-slate-200 font-mono text-xs break-all mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Vehicle Category</span>
+                <span id="c2-category" class="text-slate-200 mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Emission Norms</span>
+                <span id="c2-norms" class="text-slate-200 mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-3 gap-2">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Capacity (CC)</span>
+                <span id="c2-cc" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Cylinders</span>
+                <span id="c2-cylinders" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Seating</span>
+                <span id="c2-seating" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Unladen / Gross Weight</span>
+              <span id="c2-weight" class="text-slate-200 mt-0.5 font-mono">NA</span>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Mfg Month / Year</span>
+              <span id="c2-mfg" class="text-slate-200 font-mono mt-0.5">NA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 3: Insurance & Compliance Status -->
+        <div class="glass-panel p-6 rounded-3xl space-y-5 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-800">
+            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <i data-lucide="shield-check" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white tracking-wide">Insurance & Compliance</h2>
+          </div>
+
+          <div class="space-y-3.5 text-sm">
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Insurance Provider</span>
+              <span id="c3-ins-provider" class="text-slate-200 mt-0.5 font-semibold">NA</span>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Policy Number</span>
+                <span id="c3-ins-policy" class="text-slate-200 font-mono text-xs mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">Insurance Expiry</span>
+                <span id="c3-ins-exp" class="text-emerald-400 font-mono font-semibold mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">PUCC Number</span>
+                <span id="c3-pucc-num" class="text-slate-200 font-mono text-xs mt-0.5">NA</span>
+              </div>
+              <div class="flex flex-col">
+                <span class="text-xs text-slate-400 font-medium">PUCC Valid Upto</span>
+                <span id="c3-pucc-exp" class="text-slate-200 font-mono mt-0.5">NA</span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Vehicle Tax Valid Upto</span>
+              <span id="c3-tax-exp" class="text-slate-200 font-mono mt-0.5">NA</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- CARD 4: Finance & Banking Details -->
+        <div class="glass-panel p-6 rounded-3xl space-y-5 hover:border-cyan-500/30 transition-colors">
+          <div class="flex items-center space-x-3 pb-3 border-b border-slate-800">
+            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+              <i data-lucide="landmark" class="w-5 h-5"></i>
+            </div>
+            <h2 class="text-lg font-bold text-white tracking-wide">Finance & Banking</h2>
+          </div>
+
+          <div class="space-y-4 text-sm">
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Finance Status</span>
+              <div class="mt-1">
+                <span id="c4-fin-status" class="px-3 py-1 text-xs font-bold rounded-lg bg-cyan-950/60 text-cyan-400 border border-cyan-500/30 inline-block">
+                  NA
+                </span>
+              </div>
+            </div>
+            <div class="flex flex-col">
+              <span class="text-xs text-slate-400 font-medium">Financer / Bank Name</span>
+              <span id="c4-financer" class="text-slate-200 font-semibold mt-0.5">NA</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+  </main>
+
+  <script>
+    // Initialize Lucide icons
+    lucide.createIcons();
+
+    // DOM References
+    const inputEl = document.getElementById('reg-input');
+    const clearBtn = document.getElementById('clear-btn');
+    const searchBtn = document.getElementById('search-btn');
+    const btnText = document.getElementById('btn-text');
+
+    const skeletonContainer = document.getElementById('skeleton-container');
+    const errorCard = document.getElementById('error-card');
+    const errorMessage = document.getElementById('error-message');
+    const resultsContainer = document.getElementById('results-container');
+
+    const statusPulse = document.getElementById('status-pulse');
+    const statusDot = document.getElementById('status-dot');
+
+    // Input Sanitization & Real-time Formatting
+    inputEl.addEventListener('input', (e) => {
+      let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
+      e.target.value = val;
+      clearBtn.classList.toggle('hidden', val.length === 0);
+    });
+
+    function clearInput() {
+      inputEl.value = '';
+      clearBtn.classList.add('hidden');
+      inputEl.focus();
+    }
+
+    // Health Check on Load
+    window.addEventListener('DOMContentLoaded', () => {
+      checkServerHealth();
+    });
+
+    async function checkServerHealth() {
+      try {
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 3000);
+        
+        // Simple HEAD/GET test
+        const targetUrl = 'https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=TEST';
+        await fetch(targetUrl, { method: 'GET', signal: controller.signal, headers: { 'ngrok-skip-browser-warning': 'true' } });
+        clearTimeout(timeoutId);
+        
+        setServerStatus(true);
+      } catch (err) {
+        // Fallback to proxy check if direct fails
+        try {
+          const controller = new AbortController();
+          const timeoutId = setTimeout(() => controller.abort(), 3000);
+          const proxyUrl = 'https://corsproxy.io/?' + encodeURIComponent('https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=TEST');
+          await fetch(proxyUrl, { method: 'GET', signal: controller.signal });
+          clearTimeout(timeoutId);
+          setServerStatus(true);
+        } catch (e) {
+          setServerStatus(false);
+        }
+      }
+    }
+
+    function setServerStatus(isOnline) {
+      if (isOnline) {
+        statusPulse.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
+        statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
+      } else {
+        statusPulse.className = "hidden";
+        statusDot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500 shadow-[0_0_10px_#ef4444]";
+      }
+    }
+
+    // 7-Second Cooldown Logic
+    function startCooldown() {
+      searchBtn.disabled = true;
+      let secondsLeft = 7;
+      
+      btnText.innerHTML = `<span>Searching ${secondsLeft}s...</span>`;
+      
+      const interval = setInterval(() => {
+        secondsLeft--;
+        if (secondsLeft > 0) {
+          btnText.innerHTML = `<span>Searching ${secondsLeft}s...</span>`;
+        } else {
+          clearInterval(interval);
+          searchBtn.disabled = false;
+          btnText.innerHTML = `
+            <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
+            <span>Fetch</span>
+          `;
+          lucide.createIcons();
+        }
+      }, 1000);
+    }
+
+    // Main Search Action
+    async function handleSearch(event) {
+      event.preventDefault();
+      const regNo = inputEl.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
+
+      if (!regNo) return;
+
+      // Start UI loading states
+      startCooldown();
+      showLoadingState();
+
+      const rawEndpoint = `https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=${regNo}`;
+      const proxyEndpoint = `https://corsproxy.io/?` + encodeURIComponent(rawEndpoint);
+
+      let data = null;
+
+      try {
+        // Attempt Direct Fetch with 3.5s Timeout
+        data = await fetchWithTimeout(rawEndpoint, 3500);
+      } catch (directErr) {
+        console.warn('Direct API call failed or timed out. Attempting via CORS Proxy...');
+        try {
+          // Attempt Proxy Fetch
+          data = await fetchWithTimeout(proxyEndpoint, 5000);
+        } catch (proxyErr) {
+          console.error('Proxy API call failed:', proxyErr);
+        }
+      }
+
+      if (data && isDataValid(data)) {
+        renderVehicleData(data, regNo);
+      } else {
+        showErrorState("Data Not Found / Vehicle Records Unavailable on Server 1");
+      }
+    }
+
+    // Fetch Helper with AbortController
+    async function fetchWithTimeout(resource, timeout = 3500) {
+      const controller = new AbortController();
+      const id = setTimeout(() => controller.abort(), timeout);
+
+      const response = await fetch(resource, {
+        signal: controller.signal,
+        headers: {
+          'ngrok-skip-browser-warning': 'true'
+        }
+      });
+      clearTimeout(id);
+
+      if (!response.ok) {
+        throw new Error(`HTTP error! status: ${response.status}`);
+      }
+
+      return await response.json();
+    }
+
+    // Validate Response Data
+    function isDataValid(data) {
+      if (!data) return false;
+      if (typeof data !== 'object') return false;
+      // Basic check to confirm non-empty structure
+      const hasMeta = data.meta_data && data.meta_data.signzy_response && data.meta_data.signzy_response.result;
+      const hasCustomer = data.customer_details;
+      const hasVehicle = data.vehicle_details;
+      return !!(hasMeta || hasCustomer || hasVehicle || data.registration_number);
+    }
+
+    // UI State Switches
+    function showLoadingState() {
+      resultsContainer.classList.add('hidden');
+      errorCard.classList.add('hidden');
+      skeletonContainer.classList.remove('hidden');
+    }
+
+    function showErrorState(msg) {
+      skeletonContainer.classList.add('hidden');
+      resultsContainer.classList.add('hidden');
+      errorMessage.textContent = msg || "Data Not Found / Vehicle Records Unavailable on Server 1";
+      errorCard.classList.remove('hidden');
+    }
+
+    // Deep Safe Property Extractor
+    function getSafe(fn, fallback = "NA") {
+      try {
+        const val = fn();
+        if (val === null || val === undefined || val === '' || val === 'null' || val === 'undefined') {
+          return fallback;
+        }
+        return val;
+      } catch (e) {
+        return fallback;
+      }
+    }
+
+    // Render Data to UI
+    function renderVehicleData(data, searchReg) {
+      const res = getSafe(() => data.meta_data.signzy_response.result, {});
+      const cust = getSafe(() => data.customer_details, {});
+      const veh = getSafe(() => data.vehicle_details, {});
+      const nom = getSafe(() => data.nominee_details, {});
+
+      // Hero Banner
+      const manufacturer = getSafe(() => res.vehicleManufacturerName, '');
+      const model = getSafe(() => res.model, '');
+      const fullTitle = `${manufacturer} ${model}`.trim() || 'Vehicle Record';
+      
+      const regNo = getSafe(() => res.regNo, getSafe(() => data.registration_number, searchReg));
+      const status = getSafe(() => res.status, 'Active');
+      const vClass = getSafe(() => res.class, getSafe(() => veh.vehicle_type, 'NA'));
+      const fuel = getSafe(() => res.type, getSafe(() => res.fuelType, 'NA'));
+
+      document.getElementById('hero-title').textContent = fullTitle;
+      document.getElementById('hero-reg').textContent = regNo;
+      document.getElementById('hero-status').textContent = status;
+      document.getElementById('hero-class').textContent = vClass;
+      document.getElementById('hero-fuel').textContent = fuel;
+
+      // Status color toggle
+      const statusEl = document.getElementById('hero-status');
+      if (status.toUpperCase().includes('ACTIVE') && !status.toUpperCase().includes('INACTIVE')) {
+        statusEl.className = "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+      } else {
+        statusEl.className = "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30";
+      }
+
+      // Card 1: Owner & Registration
+      document.getElementById('c1-owner').textContent = getSafe(() => cust.full_name, getSafe(() => res.owner, 'NA'));
+      document.getElementById('c1-father').textContent = getSafe(() => res.ownerFatherName, getSafe(() => nom.name, 'NA'));
+      document.getElementById('c1-owner-count').textContent = getSafe(() => res.ownerCount, 'NA');
+      
+      const rtoName = getSafe(() => res.regAuthority, '');
+      const rtoCode = getSafe(() => res.rtoCode, getSafe(() => data.rb_rto_code, ''));
+      const rtoCombined = rtoName && rtoCode ? `${rtoName} (${rtoCode})` : (rtoName || rtoCode || 'NA');
+      document.getElementById('c1-rto').textContent = rtoCombined;
+
+      document.getElementById('c1-reg-date').textContent = getSafe(() => veh.registration_date, getSafe(() => res.regDate, 'NA'));
+      document.getElementById('c1-rc-exp').textContent = getSafe(() => res.rcExpiryDate, 'NA');
+      document.getElementById('c1-comm-addr').textContent = getSafe(() => cust.communication_address.address_line, 'NA');
+      document.getElementById('c1-perm-addr').textContent = getSafe(() => res.permanentAddress, 'NA');
+
+      // Card 2: Technical Specifications
+      document.getElementById('c2-engine').textContent = getSafe(() => data.engine_number, getSafe(() => res.engine, 'NA'));
+      document.getElementById('c2-chassis').textContent = getSafe(() => data.chassis_number, getSafe(() => res.chassis, 'NA'));
+      document.getElementById('c2-category').textContent = vClass;
+      document.getElementById('c2-norms').textContent = getSafe(() => res.normsType, 'NA');
+      document.getElementById('c2-cc').textContent = getSafe(() => res.vehicleCubicCapacity, 'NA');
+      document.getElementById('c2-cylinders').textContent = getSafe(() => res.vehicleCylindersNo, 'NA');
+      document.getElementById('c2-seating').textContent = getSafe(() => res.vehicleSeatCapacity, 'NA');
+
+      const unladen = getSafe(() => res.unladenWeight, '');
+      const gross = getSafe(() => res.grossVehicleWeight, '');
+      const weightStr = (unladen || gross) ? `${unladen || 'NA'} kg / ${gross || 'NA'} kg` : 'NA';
+      document.getElementById('c2-weight').textContent = weightStr;
+
+      const mMonth = getSafe(() => data.manufactured_month, '');
+      const mYear = getSafe(() => data.manufactured_year, '');
+      const mfgStr = (mMonth || mYear) ? `${mMonth}/${mYear}` : getSafe(() => res.vehicleManufacturingMonthYear, 'NA');
+      document.getElementById('c2-mfg').textContent = mfgStr;
+
+      // Card 3: Insurance & Compliance Status
+      document.getElementById('c3-ins-provider').textContent = getSafe(() => res.vehicleInsuranceCompanyName, 'NA');
+      document.getElementById('c3-ins-policy').textContent = getSafe(() => data.previous_policy_number, getSafe(() => res.vehicleInsurancePolicyNumber, 'NA'));
+      document.getElementById('c3-ins-exp').textContent = getSafe(() => data.previous_policy_exp_date, getSafe(() => res.vehicleInsuranceUpto, 'NA'));
+      document.getElementById('c3-pucc-num').textContent = getSafe(() => res.puccNumber, 'NA');
+      document.getElementById('c3-pucc-exp').textContent = getSafe(() => res.puccUpto, 'NA');
+      document.getElementById('c3-tax-exp').textContent = getSafe(() => res.vehicleTaxUpto, 'NA');
+
+      // Card 4: Finance & Banking Details
+      const isFinanced = getSafe(() => veh.is_vehicle_financed, null);
+      let finStatusText = "NA";
+      if (isFinanced === true || isFinanced === "true") {
+        finStatusText = "FINANCED";
+      } else if (isFinanced === false || isFinanced === "false") {
+        finStatusText = "CASH / NO FINANCE";
+      } else {
+        const financerName = getSafe(() => res.rcFinancer, '');
+        finStatusText = financerName ? "FINANCED" : "CASH / NO FINANCE";
+      }
+      
+      document.getElementById('c4-fin-status').textContent = finStatusText;
+      document.getElementById('c4-financer').textContent = getSafe(() => res.rcFinancer, 'NA');
+
+      // Switch Visibility
+      skeletonContainer.classList.add('hidden');
+      errorCard.classList.add('hidden');
+      resultsContainer.classList.remove('hidden');
+
+      // Refresh Lucide Icons inside rendered content
+      lucide.createIcons();
+    }
+  </script>
+</body>
+</html>
