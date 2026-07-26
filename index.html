@@ -5,10 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Vehicle Lookup System</title>
     
-    <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono for badges -->
+    <!-- Google Fonts: Plus Jakarta Sans -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@500;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
     
     <!-- Tailwind CSS CDN -->
     <script src="https://cdn.tailwindcss.com"></script>
@@ -22,89 +22,66 @@
                         mono: ['JetBrains Mono', 'monospace'],
                     },
                     colors: {
-                        darkBg: '#06080d',
-                        cyanAccent: '#06b6d4',
-                        emeraldAccent: '#10b981',
+                        brand: {
+                            cyan: '#06b6d4',
+                            emerald: '#10b981',
+                            dark: '#06080d',
+                        }
                     },
                     animation: {
-                        'pulse-glow': 'pulseGlow 2s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'shimmer': 'shimmer 1.5s infinite',
+                        'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
+                        'shimmer': 'shimmer 1.8s infinite linear',
                     },
                     keyframes: {
                         pulseGlow: {
-                            '0%, 100%': { opacity: '1', filter: 'drop-shadow(0 0 8px rgba(6, 182, 212, 0.6))' },
-                            '50%': { opacity: '0.6', filter: 'drop-shadow(0 0 2px rgba(6, 182, 212, 0.2))' },
+                            '0%, 100%': { opacity: 0.3, transform: 'scale(1)' },
+                            '50%': { opacity: 0.6, transform: 'scale(1.08)' },
                         },
                         shimmer: {
-                            '100%': { transform: 'translateX(100%)' }
+                            '0%': { backgroundPosition: '-200% 0' },
+                            '100%': { backgroundPosition: '200% 0' }
                         }
                     }
                 }
             }
         }
     </script>
-
-    <!-- Lucide Icons -->
+    
+    <!-- Lucide Icons CDN -->
     <script src="https://unpkg.com/lucide@latest"></script>
 
     <style>
         body {
             background-color: #06080d;
             font-family: 'Plus Jakarta Sans', sans-serif;
-            min-height: 100vh;
-            color: #f8fafc;
+            color: #f1f5f9;
             overflow-x: hidden;
+            min-height: 100vh;
         }
 
-        /* Radial Glow Background Effects */
-        .bg-glow-1 {
-            position: fixed;
-            top: -10%;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 800px;
-            height: 500px;
-            background: radial-gradient(circle, rgba(6, 182, 212, 0.12) 0%, rgba(16, 185, 129, 0.05) 45%, rgba(6, 8, 13, 0) 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        .bg-glow-2 {
-            position: fixed;
-            bottom: -20%;
-            right: -10%;
-            width: 700px;
-            height: 700px;
-            background: radial-gradient(circle, rgba(16, 185, 129, 0.08) 0%, rgba(6, 182, 212, 0.03) 50%, rgba(6, 8, 13, 0) 70%);
-            pointer-events: none;
-            z-index: 0;
-        }
-
-        /* Glassmorphism styling signature */
-        .glass-card {
+        /* Glassmorphism utility */
+        .neon-glass {
             background: rgba(15, 23, 42, 0.65);
             backdrop-filter: blur(24px);
             -webkit-backdrop-filter: blur(24px);
             border: 1px solid rgba(6, 182, 212, 0.2);
-            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(6, 182, 212, 0.05);
+            box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), 0 0 20px rgba(6, 182, 212, 0.08);
         }
 
-        .glass-box {
-            background: rgba(30, 41, 59, 0.5);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.08);
+        .neon-glass-interactive {
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+        .neon-glass-interactive:hover {
+            border-color: rgba(6, 182, 212, 0.4);
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.7), 0 0 30px rgba(6, 182, 212, 0.15);
+            transform: translateY(-2px);
         }
 
-        .glass-input {
-            background: rgba(15, 23, 42, 0.8);
-            border: 1px solid rgba(6, 182, 212, 0.3);
-            transition: all 0.3s ease;
-        }
-
-        .glass-input:focus {
-            border-color: rgba(6, 182, 212, 0.8);
-            box-shadow: 0 0 25px rgba(6, 182, 212, 0.25);
-            outline: none;
+        /* Skeleton shimmer gradient */
+        .skeleton-shimmer {
+            background: linear-gradient(90deg, rgba(30, 41, 59, 0.5) 25%, rgba(51, 65, 85, 0.8) 50%, rgba(30, 41, 59, 0.5) 75%);
+            background-size: 200% 100%;
+            animation: shimmer 1.5s infinite;
         }
 
         /* Custom Scrollbar */
@@ -115,337 +92,308 @@
             background: #06080d;
         }
         ::-webkit-scrollbar-thumb {
-            background: rgba(6, 182, 212, 0.2);
-            border-radius: 4px;
+            background: #1e293b;
+            border-radius: 9999px;
+            border: 2px solid #06080d;
         }
         ::-webkit-scrollbar-thumb:hover {
-            background: rgba(6, 182, 212, 0.5);
+            background: #06b6d4;
         }
     </style>
 </head>
-<body class="relative flex flex-col items-center justify-start min-h-screen p-4 md:p-8 select-none">
+<body class="relative flex flex-col justify-center items-center min-h-screen p-4 md:p-8 select-none">
 
-    <!-- Radial Background Glows -->
-    <div class="bg-glow-1"></div>
-    <div class="bg-glow-2"></div>
+    <!-- SUBTLE BACKGROUND AMBIENT RADIAL GLOWS -->
+    <div class="fixed top-[-10%] left-[-10%] w-[500px] h-[500px] rounded-full bg-cyan-600/15 blur-[120px] pointer-events-none animate-pulse-glow z-0"></div>
+    <div class="fixed bottom-[-10%] right-[-10%] w-[600px] h-[600px] rounded-full bg-emerald-600/15 blur-[140px] pointer-events-none animate-pulse-glow z-0" style="animation-delay: 1.5s;"></div>
 
     <!-- TOP CORNER SERVER STATUS INDICATOR -->
-    <div class="fixed top-5 right-5 z-50 flex items-center gap-2.5 px-4 py-2 rounded-full glass-card text-xs font-medium text-slate-300 shadow-xl group border-slate-800 hover:border-cyan-500/40 transition-all cursor-pointer">
-        <span class="relative flex h-2.5 w-2.5">
-            <span id="server-ping-ring" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-            <span id="server-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
-        </span>
-        <span class="tracking-wide text-slate-200">Server 1 Gateway</span>
-        
-        <!-- Hover Tooltip -->
-        <div class="absolute top-10 right-0 hidden group-hover:flex flex-col items-end whitespace-nowrap bg-slate-900 border border-slate-700/80 text-slate-300 text-[11px] px-3 py-1.5 rounded-lg shadow-2xl">
-            <span id="server-status-text">Status: Checking connection...</span>
+    <div class="fixed top-5 right-5 z-50">
+        <div class="flex items-center gap-2.5 px-3.5 py-1.5 rounded-full neon-glass text-xs font-mono tracking-wide text-slate-300 border border-slate-700/50 shadow-lg group transition-all duration-300 hover:border-cyan-500/40 cursor-default">
+            <span id="serverDot" class="w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]"></span>
+            <span id="serverStatusText" class="font-medium">Server 1 Gateway</span>
         </div>
     </div>
 
-    <!-- MAIN CONTAINER -->
-    <main class="relative z-10 w-full max-w-4xl mx-auto my-auto flex flex-col items-center gap-8 py-10">
+    <!-- MAIN APP CONTAINER -->
+    <main class="w-full max-w-4xl z-10 flex flex-col gap-6 my-auto">
 
-        <!-- CENTERED FLOATING SEARCH INTERFACE -->
-        <div class="w-full max-w-2xl">
-            <div class="glass-card rounded-3xl p-4 md:p-6 shadow-2xl relative overflow-hidden group">
-                <div class="absolute -inset-0.5 bg-gradient-to-r from-cyan-500/20 to-emerald-500/20 rounded-3xl blur opacity-30 group-hover:opacity-60 transition duration-500"></div>
-                
-                <form id="search-form" onsubmit="handleSearch(event)" class="relative flex flex-col sm:flex-row items-center gap-3">
-                    <div class="relative w-full">
-                        <div class="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none text-cyan-400">
-                            <i data-lucide="search" class="w-5 h-5"></i>
+        <!-- SEARCH INTERFACE (FLOATING) -->
+        <section class="w-full">
+            <form id="searchForm" onsubmit="handleSearch(event)" class="neon-glass p-3 md:p-4 rounded-3xl flex flex-col sm:flex-row items-center gap-3 border border-cyan-500/30 transition-all duration-500">
+                <div class="relative w-full flex items-center">
+                    <div class="absolute left-4 text-cyan-400">
+                        <i data-lucide="search" class="w-5 h-5"></i>
+                    </div>
+                    <input 
+                        type="text" 
+                        id="regInput" 
+                        placeholder="ENTER REGISTRATION NO (e.g. MH01AB1234)"
+                        required
+                        autocomplete="off"
+                        spellcheck="false"
+                        oninput="formatInput(this)"
+                        class="w-full bg-slate-950/60 text-cyan-300 font-mono text-base md:text-lg tracking-wider placeholder:text-slate-500 placeholder:font-sans placeholder:text-sm placeholder:tracking-normal pl-12 pr-4 py-3.5 rounded-2xl border border-slate-800/80 focus:outline-none focus:border-cyan-500 focus:ring-2 focus:ring-cyan-500/20 transition-all duration-300"
+                    />
+                </div>
+                <button 
+                    type="submit" 
+                    id="searchBtn" 
+                    class="w-full sm:w-auto min-w-[160px] bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-bold px-6 py-3.5 rounded-2xl flex items-center justify-center gap-2 shadow-lg shadow-cyan-500/20 active:scale-[0.98] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none"
+                >
+                    <i data-lucide="zap" class="w-5 h-5 fill-current"></i>
+                    <span id="btnText">FETCH DETAILS</span>
+                </button>
+            </form>
+        </section>
+
+        <!-- RESULTS CONTAINER -->
+        <div id="resultContainer" class="hidden flex-col gap-6 w-full transition-all duration-500">
+
+            <!-- SKELETON LOADER STATE -->
+            <div id="skeletonLoader" class="hidden flex-col gap-6">
+                <!-- Hero Skeleton -->
+                <div class="neon-glass p-6 rounded-3xl flex flex-col gap-4">
+                    <div class="flex justify-between items-start gap-4">
+                        <div class="space-y-2 flex-1">
+                            <div class="h-4 w-28 skeleton-shimmer rounded-lg"></div>
+                            <div class="h-7 w-48 skeleton-shimmer rounded-xl"></div>
+                            <div class="h-4 w-20 skeleton-shimmer rounded-lg mt-2"></div>
+                            <div class="h-6 w-36 skeleton-shimmer rounded-xl"></div>
                         </div>
-                        <input 
-                            type="text" 
-                            id="reg-input" 
-                            placeholder="ENTER REGISTRATION NO. (E.G. MH01AB1234)"
-                            maxlength="15"
-                            autocomplete="off"
-                            spellcheck="false"
-                            oninput="formatInput(this)"
-                            class="glass-input w-full pl-12 pr-4 py-4 rounded-2xl text-slate-100 font-mono font-bold text-base md:text-lg tracking-wider placeholder:text-slate-500 placeholder:font-sans placeholder:font-normal placeholder:text-sm uppercase"
-                        />
+                        <div class="h-8 w-28 skeleton-shimmer rounded-full"></div>
                     </div>
-                    <button 
-                        type="submit" 
-                        id="search-btn"
-                        class="w-full sm:w-auto min-w-[140px] px-8 py-4 bg-gradient-to-r from-cyan-500 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 text-slate-950 font-extrabold text-sm tracking-wider uppercase rounded-2xl transition-all shadow-lg shadow-cyan-500/20 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:active:scale-100 flex items-center justify-center gap-2"
-                    >
-                        <i data-lucide="zap" class="w-4 h-4 fill-current"></i>
-                        <span id="btn-text">FETCH</span>
-                    </button>
-                </form>
-            </div>
-        </div>
-
-        <!-- SKELETON LOADER (Hidden by default) -->
-        <div id="skeleton-loader" class="hidden w-full space-y-6">
-            <!-- Hero Skeleton -->
-            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 relative overflow-hidden">
-                <div class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"></div>
-                <div class="flex flex-wrap items-center justify-between gap-4">
-                    <div class="h-10 w-48 bg-slate-800/80 rounded-xl"></div>
-                    <div class="flex gap-2">
-                        <div class="h-7 w-20 bg-slate-800/80 rounded-full"></div>
-                        <div class="h-7 w-20 bg-slate-800/80 rounded-full"></div>
+                    <div class="flex gap-2 pt-2">
+                        <div class="h-7 w-24 skeleton-shimmer rounded-lg"></div>
+                        <div class="h-7 w-24 skeleton-shimmer rounded-lg"></div>
                     </div>
                 </div>
-                <div class="space-y-4">
-                    <div class="h-20 bg-slate-800/50 rounded-2xl border border-slate-700/30"></div>
-                    <div class="h-20 bg-slate-800/50 rounded-2xl border border-slate-700/30"></div>
-                </div>
-            </div>
-
-            <!-- Grid Skeletons -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="glass-card rounded-3xl p-6 h-64 space-y-4 relative overflow-hidden">
-                    <div class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"></div>
-                    <div class="h-6 w-36 bg-slate-800/80 rounded-lg"></div>
-                    <div class="space-y-3 pt-2">
-                        <div class="h-4 w-full bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-3/4 bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-5/6 bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-2/3 bg-slate-800/50 rounded"></div>
+                <!-- Grid Cards Skeleton -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="neon-glass p-6 rounded-3xl space-y-4">
+                        <div class="h-6 w-1/3 skeleton-shimmer rounded-lg"></div>
+                        <div class="space-y-2">
+                            <div class="h-4 w-full skeleton-shimmer rounded-md"></div>
+                            <div class="h-4 w-3/4 skeleton-shimmer rounded-md"></div>
+                            <div class="h-4 w-5/6 skeleton-shimmer rounded-md"></div>
+                        </div>
                     </div>
-                </div>
-                <div class="glass-card rounded-3xl p-6 h-64 space-y-4 relative overflow-hidden">
-                    <div class="absolute inset-0 -translate-x-full animate-shimmer bg-gradient-to-r from-transparent via-cyan-500/10 to-transparent"></div>
-                    <div class="h-6 w-36 bg-slate-800/80 rounded-lg"></div>
-                    <div class="space-y-3 pt-2">
-                        <div class="h-4 w-full bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-3/4 bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-5/6 bg-slate-800/50 rounded"></div>
-                        <div class="h-4 w-2/3 bg-slate-800/50 rounded"></div>
+                    <div class="neon-glass p-6 rounded-3xl space-y-4">
+                        <div class="h-6 w-1/3 skeleton-shimmer rounded-lg"></div>
+                        <div class="space-y-2">
+                            <div class="h-4 w-full skeleton-shimmer rounded-md"></div>
+                            <div class="h-4 w-3/4 skeleton-shimmer rounded-md"></div>
+                            <div class="h-4 w-5/6 skeleton-shimmer rounded-md"></div>
+                        </div>
                     </div>
                 </div>
             </div>
-        </div>
 
-        <!-- DATA NOT FOUND CARD (Hidden by default) -->
-        <div id="not-found-card" class="hidden w-full max-w-xl">
-            <div class="glass-card rounded-3xl p-8 text-center border-amber-500/30 bg-slate-900/80 shadow-2xl space-y-4">
-                <div class="inline-flex p-4 rounded-full bg-amber-500/10 text-amber-400 ring-1 ring-amber-500/30 mb-2">
-                    <i data-lucide="alert-triangle" class="w-10 h-10 animate-bounce"></i>
+            <!-- DATA NOT FOUND STATE -->
+            <div id="notFoundCard" class="hidden neon-glass p-8 md:p-12 rounded-3xl flex-col items-center text-center gap-4 border-amber-500/30">
+                <div class="w-16 h-16 rounded-full bg-amber-500/10 border border-amber-500/30 flex items-center justify-center text-amber-400 shadow-[0_0_20px_rgba(245,158,11,0.2)]">
+                    <i data-lucide="alert-triangle" class="w-8 h-8"></i>
                 </div>
-                <h3 class="text-xl font-bold text-slate-100">Vehicle Records Unavailable</h3>
-                <p class="text-slate-400 text-sm max-w-md mx-auto">
-                    Data Not Found / Vehicle Records Unavailable on Server 1. Please verify the registration number and try again.
+                <h3 class="text-xl font-bold text-amber-300 tracking-wide">Data Not Found</h3>
+                <p class="text-slate-400 max-w-md text-sm leading-relaxed">
+                    Vehicle Records Unavailable on Server 1. Please check the registration number or try again later.
                 </p>
             </div>
-        </div>
 
-        <!-- DYNAMIC RESULTS CONTAINER (Hidden by default) -->
-        <div id="results-container" class="hidden w-full space-y-6">
-            
-            <!-- 🔵 HERO BANNER CARD -->
-            <div class="glass-card rounded-3xl p-6 md:p-8 space-y-6 border-cyan-500/30 relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none"></div>
+            <!-- ACTUAL DATA CONTENT -->
+            <div id="dataView" class="hidden flex-col gap-6">
 
-                <!-- Top Header Row -->
-                <div class="flex flex-wrap items-center justify-between gap-4 border-b border-slate-800/80 pb-6">
-                    <div class="space-y-1">
-                        <span class="text-xs uppercase font-semibold text-slate-400 tracking-wider">Registration Number</span>
-                        <div class="flex items-center gap-3">
-                            <span id="hero-reg-no" class="font-mono font-extrabold text-2xl md:text-3xl text-cyan-400 tracking-wider">
+                <!-- 🔵 HERO BANNER CARD -->
+                <div class="neon-glass p-6 md:p-8 rounded-3xl relative overflow-hidden flex flex-col md:flex-row justify-between items-start md:items-center gap-6 border-cyan-500/30">
+                    <div class="flex flex-col gap-4 w-full md:w-auto">
+                        
+                        <!-- DEDICATED MANUFACTURER & MODEL BOXES -->
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 w-full">
+                            <!-- Box 1: Manufacturer -->
+                            <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80 flex flex-col gap-1">
+                                <span class="text-[10px] font-semibold tracking-wider text-cyan-400/80 uppercase">Manufacturer</span>
+                                <span id="heroManufacturer" class="text-base font-bold text-slate-100 truncate">NA</span>
+                            </div>
+                            <!-- Box 2: Model -->
+                            <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-slate-800/80 flex flex-col gap-1">
+                                <span class="text-[10px] font-semibold tracking-wider text-emerald-400/80 uppercase">Model</span>
+                                <span id="heroModel" class="text-base font-bold text-slate-100 truncate">NA</span>
+                            </div>
+                        </div>
+
+                        <!-- Registration Number & Badges -->
+                        <div class="flex flex-wrap items-center gap-2.5 pt-1">
+                            <span id="heroRegNo" class="font-mono text-lg font-extrabold bg-cyan-950/60 text-cyan-300 border border-cyan-500/40 px-3.5 py-1.5 rounded-xl shadow-inner tracking-widest">
+                                NA
+                            </span>
+                            <span id="heroStatusBadge" class="text-xs font-bold px-3 py-1.5 rounded-xl border flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border-emerald-500/30">
+                                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> ACTIVE
+                            </span>
+                            <span id="heroClassBadge" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/60">
+                                NA
+                            </span>
+                            <span id="heroFuelBadge" class="text-xs font-semibold px-3 py-1.5 rounded-xl bg-slate-800/80 text-slate-300 border border-slate-700/60">
                                 NA
                             </span>
                         </div>
                     </div>
-
-                    <!-- Badges -->
-                    <div class="flex flex-wrap items-center gap-2">
-                        <span id="hero-status-badge" class="px-3 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-emerald-950/60 text-emerald-400 border border-emerald-500/30">
-                            ACTIVE
-                        </span>
-                        <span id="hero-class-badge" class="px-3 py-1 rounded-full text-xs font-semibold text-slate-300 bg-slate-800/80 border border-slate-700/50">
-                            NA
-                        </span>
-                        <span id="hero-fuel-badge" class="px-3 py-1 rounded-full text-xs font-semibold text-cyan-300 bg-cyan-950/50 border border-cyan-500/30">
-                            NA
-                        </span>
-                    </div>
                 </div>
 
-                <!-- MANUFACTURER & MODEL DEDICATED GLASS BOXES -->
-                <div class="grid grid-cols-1 gap-4">
-                    <!-- Box 1 (Manufacturer) -->
-                    <div class="glass-box rounded-2xl p-4 md:p-5 border-l-4 border-l-cyan-400 relative group transition-all hover:bg-slate-800/40">
-                        <div class="text-[11px] font-bold uppercase tracking-widest text-cyan-400/90 mb-1">
-                            MANUFACTURER
+                <!-- DETAILED DATA CARDS GRID -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+
+                    <!-- 📦 CARD 1: Owner & Registration Details -->
+                    <div class="neon-glass neon-glass-interactive p-6 rounded-3xl flex flex-col gap-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
+                            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                <i data-lucide="user" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-200 tracking-wide">Owner & Registration</h3>
                         </div>
-                        <div id="hero-manufacturer" class="text-lg md:text-xl font-bold text-slate-100 uppercase tracking-wide">
-                            NA
+
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-slate-400 font-medium">Owner Name</span>
+                                <span id="ownerName" class="text-slate-100 font-semibold text-right">NA</span>
+                            </div>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-slate-400 font-medium">Father / Nominee</span>
+                                <span id="ownerFather" class="text-slate-100 font-medium text-right">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Owner Serial Count</span>
+                                <span id="ownerCount" class="text-slate-100 font-medium bg-slate-800/60 px-2.5 py-0.5 rounded-md font-mono text-xs">NA</span>
+                            </div>
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-slate-400 font-medium">Registering Authority</span>
+                                <span id="regAuthority" class="text-slate-100 font-medium text-right">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Registration Date</span>
+                                <span id="regDate" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">RC Expiry Date</span>
+                                <span id="rcExpiry" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="border-t border-slate-800/60 pt-2 flex flex-col gap-1">
+                                <span class="text-slate-400 font-medium">Communication Address</span>
+                                <span id="commAddress" class="text-slate-300 text-xs leading-relaxed">NA</span>
+                            </div>
+                            <div class="flex flex-col gap-1">
+                                <span class="text-slate-400 font-medium">Permanent Address</span>
+                                <span id="permAddress" class="text-slate-300 text-xs leading-relaxed">NA</span>
+                            </div>
                         </div>
                     </div>
 
-                    <!-- Box 2 (Model) -->
-                    <div class="glass-box rounded-2xl p-4 md:p-5 border-l-4 border-l-emerald-400 relative group transition-all hover:bg-slate-800/40">
-                        <div class="text-[11px] font-bold uppercase tracking-widest text-emerald-400/90 mb-1">
-                            MODEL
+                    <!-- 📦 CARD 2: Technical Specifications -->
+                    <div class="neon-glass neon-glass-interactive p-6 rounded-3xl flex flex-col gap-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
+                            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                <i data-lucide="cpu" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-200 tracking-wide">Technical Specs</h3>
                         </div>
-                        <div id="hero-model" class="text-lg md:text-xl font-bold text-slate-100 uppercase tracking-wide">
-                            NA
+
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Engine Number</span>
+                                <span id="engineNo" class="text-slate-100 font-mono text-xs font-semibold bg-slate-950/60 px-2 py-1 rounded border border-slate-800">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Chassis Number</span>
+                                <span id="chassisNo" class="text-slate-100 font-mono text-xs font-semibold bg-slate-950/60 px-2 py-1 rounded border border-slate-800">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Vehicle Category</span>
+                                <span id="vehicleCategory" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Emission Norms</span>
+                                <span id="normsType" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Cubic Capacity (CC)</span>
+                                <span id="cubicCapacity" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Cylinder Count</span>
+                                <span id="cylinderCount" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Seating Capacity</span>
+                                <span id="seatingCapacity" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Unladen / Gross Weight</span>
+                                <span id="weightDetails" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Manufacturing Date</span>
+                                <span id="mfgDate" class="text-slate-100 font-medium">NA</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            </div>
 
-            <!-- DETAILED INFO GRID CARDS -->
-            <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-
-                <!-- 📦 CARD 1: Owner & Registration Details -->
-                <div class="glass-card rounded-3xl p-6 space-y-4 hover:border-cyan-500/40 transition-all">
-                    <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
-                        <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
-                            <i data-lucide="user" class="w-5 h-5"></i>
+                    <!-- 📦 CARD 3: Insurance & Compliance Status -->
+                    <div class="neon-glass neon-glass-interactive p-6 rounded-3xl flex flex-col gap-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
+                            <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                                <i data-lucide="shield-check" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-200 tracking-wide">Insurance & Compliance</h3>
                         </div>
-                        <h3 class="font-bold text-base text-slate-200 tracking-wide">Owner & Registration</h3>
+
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="flex justify-between items-start gap-2">
+                                <span class="text-slate-400 font-medium">Insurance Company</span>
+                                <span id="insuranceProvider" class="text-slate-100 font-medium text-right">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Policy Number</span>
+                                <span id="insurancePolicy" class="text-slate-100 font-mono text-xs bg-slate-950/60 px-2 py-1 rounded border border-slate-800">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Insurance Expiry</span>
+                                <span id="insuranceExpiry" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">PUCC Number</span>
+                                <span id="puccNo" class="text-slate-100 font-mono text-xs bg-slate-950/60 px-2 py-1 rounded border border-slate-800">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">PUCC Valid Upto</span>
+                                <span id="puccUpto" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Vehicle Tax Status</span>
+                                <span id="taxStatus" class="text-slate-100 font-medium">NA</span>
+                            </div>
+                        </div>
                     </div>
 
-                    <dl class="space-y-3 text-sm">
-                        <div class="flex justify-between items-start">
-                            <dt class="text-slate-400">Full Owner Name</dt>
-                            <dd id="c1-owner" class="font-semibold text-slate-100 text-right">NA</dd>
+                    <!-- 📦 CARD 4: Finance & Banking Details -->
+                    <div class="neon-glass neon-glass-interactive p-6 rounded-3xl flex flex-col gap-4">
+                        <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
+                            <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400 border border-cyan-500/20">
+                                <i data-lucide="landmark" class="w-5 h-5"></i>
+                            </div>
+                            <h3 class="text-base font-bold text-slate-200 tracking-wide">Finance & Banking</h3>
                         </div>
-                        <div class="flex justify-between items-start">
-                            <dt class="text-slate-400">Father's Name</dt>
-                            <dd id="c1-father" class="font-medium text-slate-300 text-right">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Owner Serial Count</dt>
-                            <dd id="c1-owner-count" class="font-mono text-cyan-400 font-bold">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-start">
-                            <dt class="text-slate-400">Registering Authority (RTO)</dt>
-                            <dd id="c1-rto" class="font-medium text-slate-200 text-right max-w-[60%]">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Registration Date</dt>
-                            <dd id="c1-reg-date" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">RC Expiry Date</dt>
-                            <dd id="c1-rc-expiry" class="font-mono">NA</dd>
-                        </div>
-                        <div class="border-t border-slate-800/60 pt-2 flex flex-col gap-1">
-                            <dt class="text-xs font-semibold text-slate-400">Communication Address</dt>
-                            <dd id="c1-comm-addr" class="text-xs text-slate-300 leading-relaxed">NA</dd>
-                        </div>
-                        <div class="border-t border-slate-800/60 pt-2 flex flex-col gap-1">
-                            <dt class="text-xs font-semibold text-slate-400">Permanent Address</dt>
-                            <dd id="c1-perm-addr" class="text-xs text-slate-300 leading-relaxed">NA</dd>
-                        </div>
-                    </dl>
-                </div>
 
-                <!-- 📦 CARD 2: Technical Specifications -->
-                <div class="glass-card rounded-3xl p-6 space-y-4 hover:border-cyan-500/40 transition-all">
-                    <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
-                        <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-                            <i data-lucide="cpu" class="w-5 h-5"></i>
+                        <div class="space-y-3 text-xs md:text-sm">
+                            <div class="flex justify-between items-center gap-2">
+                                <span class="text-slate-400 font-medium">Finance Status</span>
+                                <span id="financeStatus" class="text-xs font-bold px-3 py-1 rounded-full border bg-slate-800 text-slate-300 border-slate-700">NA</span>
+                            </div>
+                            <div class="flex flex-col gap-1 pt-2">
+                                <span class="text-slate-400 font-medium">Financer / Bank Name</span>
+                                <span id="financerName" class="text-slate-100 font-semibold leading-relaxed">NA</span>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-base text-slate-200 tracking-wide">Technical Specifications</h3>
                     </div>
 
-                    <dl class="space-y-3 text-sm">
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Engine Number</dt>
-                            <dd id="c2-engine" class="font-mono font-semibold text-slate-200">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Chassis Number</dt>
-                            <dd id="c2-chassis" class="font-mono font-semibold text-slate-200">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Vehicle Category / Type</dt>
-                            <dd id="c2-category" class="font-medium text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Fuel Norms Type</dt>
-                            <dd id="c2-norms" class="font-medium text-emerald-400">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Cubic Capacity (CC)</dt>
-                            <dd id="c2-cc" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Cylinder Count</dt>
-                            <dd id="c2-cylinders" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Seating Capacity</dt>
-                            <dd id="c2-seating" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Unladen / Gross Weight</dt>
-                            <dd id="c2-weight" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Manufacturing Month/Year</dt>
-                            <dd id="c2-mfg-date" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                    </dl>
-                </div>
-
-                <!-- 📦 CARD 3: Insurance & Compliance Status -->
-                <div class="glass-card rounded-3xl p-6 space-y-4 hover:border-cyan-500/40 transition-all">
-                    <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
-                        <div class="p-2 rounded-xl bg-cyan-500/10 text-cyan-400">
-                            <i data-lucide="shield-check" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="font-bold text-base text-slate-200 tracking-wide">Insurance & Compliance</h3>
-                    </div>
-
-                    <dl class="space-y-3 text-sm">
-                        <div class="flex justify-between items-start">
-                            <dt class="text-slate-400">Insurance Provider</dt>
-                            <dd id="c3-insurer" class="font-semibold text-slate-200 text-right max-w-[60%]">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Insurance Policy No.</dt>
-                            <dd id="c3-policy-no" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Insurance Expiry Date</dt>
-                            <dd id="c3-ins-expiry" class="font-mono">NA</dd>
-                        </div>
-                        <div class="border-t border-slate-800/60 pt-2 flex justify-between items-center">
-                            <dt class="text-slate-400">PUCC Certificate Number</dt>
-                            <dd id="c3-pucc-no" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">PUCC Valid Upto</dt>
-                            <dd id="c3-pucc-upto" class="font-mono">NA</dd>
-                        </div>
-                        <div class="border-t border-slate-800/60 pt-2 flex justify-between items-center">
-                            <dt class="text-slate-400">Vehicle Tax Status</dt>
-                            <dd id="c3-tax-upto" class="font-mono text-slate-300">NA</dd>
-                        </div>
-                    </dl>
-                </div>
-
-                <!-- 📦 CARD 4: Finance & Banking Details -->
-                <div class="glass-card rounded-3xl p-6 space-y-4 hover:border-cyan-500/40 transition-all">
-                    <div class="flex items-center gap-3 border-b border-slate-800/80 pb-3">
-                        <div class="p-2 rounded-xl bg-emerald-500/10 text-emerald-400">
-                            <i data-lucide="landmark" class="w-5 h-5"></i>
-                        </div>
-                        <h3 class="font-bold text-base text-slate-200 tracking-wide">Finance & Banking</h3>
-                    </div>
-
-                    <dl class="space-y-4 text-sm">
-                        <div class="flex justify-between items-center">
-                            <dt class="text-slate-400">Finance Status</dt>
-                            <dd id="c4-finance-status">
-                                <span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300">NA</span>
-                            </dd>
-                        </div>
-                        <div class="flex justify-between items-start">
-                            <dt class="text-slate-400">Financer / Bank Name</dt>
-                            <dd id="c4-financer" class="font-semibold text-slate-200 text-right max-w-[65%] leading-snug">NA</dd>
-                        </div>
-                    </dl>
                 </div>
 
             </div>
@@ -456,344 +404,295 @@
 
     <!-- JAVASCRIPT LOGIC -->
     <script>
-        // Initialize Lucide Icons
+        // Initialize Lucide Icons on start
         lucide.createIcons();
 
-        // Safe Value Helper (handles null, undefined, empty strings)
-        function safeVal(val, fallback = "NA") {
-            if (val === null || val === undefined || val === "" || val === "null" || val === "undefined") {
-                return fallback;
-            }
-            if (typeof val === 'string') {
-                const trimmed = val.trim();
-                return trimmed.length > 0 ? trimmed : fallback;
-            }
-            return val;
-        }
+        // Server Status Ping Logic
+        async function checkServerStatus() {
+            const serverDot = document.getElementById('serverDot');
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3000);
+                
+                // Ping endpoint or healthcheck
+                const res = await fetch('https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=TEST', {
+                    method: 'GET',
+                    signal: controller.signal,
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                }).catch(() => null);
 
-        // Input Pre-processing
+                clearTimeout(timeoutId);
+
+                // If res is returned (even 400/404), server gateway is alive
+                if (res) {
+                    serverDot.className = 'w-2.5 h-2.5 rounded-full bg-emerald-500 animate-pulse shadow-[0_0_10px_#10b981]';
+                } else {
+                    serverDot.className = 'w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]';
+                }
+            } catch (err) {
+                serverDot.className = 'w-2.5 h-2.5 rounded-full bg-red-500 shadow-[0_0_10px_#ef4444]';
+            }
+        }
+        checkServerStatus();
+        setInterval(checkServerStatus, 30000);
+
+        // Input Pre-processing (Strip spaces/hyphens, Force Uppercase)
         function formatInput(input) {
-            let value = input.value;
-            // Automatically strip spaces, hyphens, and special characters
-            value = value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
-            input.value = value;
+            input.value = input.value.replace(/[^a-zA-Z0-9]/g, '').toUpperCase();
         }
 
-        // DYNAMIC DATE COLOR FORMATTING LOGIC
-        function formatDateWithHighlight(dateStr) {
-            const raw = safeVal(dateStr);
-            if (raw === "NA") return '<span class="text-slate-400 font-mono">NA</span>';
+        // Helper to safely fetch nested object value
+        function getNestedVal(obj, path) {
+            if (!obj) return null;
+            return path.split('.').reduce((acc, part) => (acc && acc[part] !== undefined && acc[part] !== null) ? acc[part] : null, obj);
+        }
 
-            // Clean date string
-            let parsedDate = null;
+        // Helper for Date Parsing & Dynamic Emerald Green Highlighting
+        function formatAndHighlightDate(dateStr) {
+            if (!dateStr || dateStr === 'NA' || dateStr === 'N/A' || dateStr.toString().trim() === '') return 'NA';
+            
+            const raw = dateStr.toString().trim();
+            let dateObj = null;
 
-            // Handle formats: DD/MM/YYYY, YYYY-MM-DD, DD-MM-YYYY
-            if (raw.includes('/')) {
-                const parts = raw.split('/');
-                if (parts.length === 3) {
-                    if (parts[2].length === 4) { // DD/MM/YYYY
-                        parsedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+            // Try parsing DD/MM/YYYY or DD-MM-YYYY
+            const dmyMatch = raw.match(/^(\d{1,2})[\/\-](\d{1,2})[\/\-](\d{4})$/);
+            if (dmyMatch) {
+                dateObj = new Date(parseInt(dmyMatch[3]), parseInt(dmyMatch[2]) - 1, parseInt(dmyMatch[1]));
+            } else {
+                // Try YYYY-MM-DD
+                const ymdMatch = raw.match(/^(\d{4})[\/\-](\d{1,2})[\/\-](\d{1,2})$/);
+                if (ymdMatch) {
+                    dateObj = new Date(parseInt(ymdMatch[1]), parseInt(ymdMatch[2]) - 1, parseInt(ymdMatch[3]));
+                } else {
+                    const parsed = new Date(raw);
+                    if (!isNaN(parsed.getTime())) {
+                        dateObj = parsed;
                     }
                 }
-            } else if (raw.includes('-')) {
-                const parts = raw.split('-');
-                if (parts.length === 3) {
-                    if (parts[0].length === 4) { // YYYY-MM-DD
-                        parsedDate = new Date(parts[0], parts[1] - 1, parts[2]);
-                    } else if (parts[2].length === 4) { // DD-MM-YYYY
-                        parsedDate = new Date(parts[2], parts[1] - 1, parts[0]);
-                    }
-                }
             }
 
-            // Fallback standard parse if above patterns didn't hit
-            if (!parsedDate || isNaN(parsedDate.getTime())) {
-                parsedDate = new Date(raw);
+            if (!dateObj || isNaN(dateObj.getTime())) {
+                return raw; // return string as-is if unparseable date
             }
 
-            if (isNaN(parsedDate.getTime())) {
-                return `<span class="text-slate-300 font-mono">${raw}</span>`;
-            }
-
-            // Normalize Today's Date (00:00:00)
             const today = new Date();
             today.setHours(0, 0, 0, 0);
-            
-            const targetDate = new Date(parsedDate);
-            targetDate.setHours(0, 0, 0, 0);
 
-            // Compare parsed date against Today's Date
-            if (targetDate >= today) {
-                // TODAY or IN THE FUTURE (>= Today) -> Glowing green
-                return `<span class="text-emerald-400 font-bold bg-emerald-950/50 px-2 py-0.5 rounded border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.2)] font-mono">${raw}</span>`;
+            const isFutureOrToday = dateObj.getTime() >= today.getTime();
+            const formattedText = dateObj.toLocaleDateString('en-IN', { day: '2-digit', month: 'short', year: 'numeric' });
+
+            if (isFutureOrToday) {
+                return `<span class="text-emerald-400 font-semibold tracking-wide flex items-center justify-end gap-1"><i data-lucide="check-circle-2" class="w-3.5 h-3.5 inline"></i>${formattedText}</span>`;
             } else {
-                // IN THE PAST (< Today) -> Normal muted text
-                return `<span class="text-slate-400 font-mono">${raw}</span>`;
+                return `<span class="text-slate-400">${formattedText}</span>`;
             }
         }
 
-        // 7-SECOND COOLDOWN COUNTDOWN LOGIC
-        let cooldownActive = false;
+        // Value fallback helper
+        function val(primary, fallback = 'NA') {
+            if (primary !== null && primary !== undefined && primary.toString().trim() !== '') {
+                return primary.toString().trim();
+            }
+            return fallback;
+        }
+
+        // 7-Second Cooldown Timer Logic
+        let searchCooldown = false;
         function startCooldown() {
-            cooldownActive = true;
-            const searchBtn = document.getElementById('search-btn');
-            const btnText = document.getElementById('btn-text');
+            searchCooldown = true;
+            const searchBtn = document.getElementById('searchBtn');
+            const btnText = document.getElementById('btnText');
+            let timeLeft = 7;
+
             searchBtn.disabled = true;
+            btnText.textContent = `Searching ${timeLeft}s...`;
 
-            let remaining = 7;
-            btnText.innerText = `Searching ${remaining}s...`;
-
-            const interval = setInterval(() => {
-                remaining--;
-                if (remaining > 0) {
-                    btnText.innerText = `Searching ${remaining}s...`;
+            const timer = setInterval(() => {
+                timeLeft--;
+                if (timeLeft > 0) {
+                    btnText.textContent = `Searching ${timeLeft}s...`;
                 } else {
-                    clearInterval(interval);
-                    cooldownActive = false;
+                    clearInterval(timer);
                     searchBtn.disabled = false;
-                    btnText.innerText = "FETCH";
+                    btnText.textContent = 'FETCH DETAILS';
+                    searchCooldown = false;
                 }
             }, 1000);
         }
 
-        // SERVER STATUS HEALTH CHECK
-        async function checkServerGateway() {
-            const dot = document.getElementById('server-dot');
-            const ring = document.getElementById('server-ping-ring');
-            const statusText = document.getElementById('server-status-text');
+        // Main Search Trigger
+        async function handleSearch(e) {
+            e.preventDefault();
+            if (searchCooldown) return;
 
-            const targetUrl = 'https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=PING';
-            const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 2500);
+            const regNo = document.getElementById('regInput').value.trim();
+            if (!regNo) return;
 
-            try {
-                const res = await fetch(targetUrl, { signal: controller.signal, method: 'GET' });
-                clearTimeout(timeoutId);
-                // Mark Online
-                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500";
-                ring.className = "animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75";
-                statusText.innerText = "Status: Online (Server 1 Active)";
-            } catch (err) {
-                clearTimeout(timeoutId);
-                // Mark Offline / Warning state
-                dot.className = "relative inline-flex rounded-full h-2.5 w-2.5 bg-red-500";
-                ring.className = "hidden";
-                statusText.innerText = "Status: Offline / Gateway Unreachable";
-            }
-        }
+            const resultContainer = document.getElementById('resultContainer');
+            const skeletonLoader = document.getElementById('skeletonLoader');
+            const notFoundCard = document.getElementById('notFoundCard');
+            const dataView = document.getElementById('dataView');
 
-        // Run server status check on load
-        checkServerGateway();
-        setInterval(checkServerGateway, 30000); // Check every 30s
+            // Reset UI States
+            resultContainer.classList.remove('hidden');
+            resultContainer.classList.add('flex');
+            skeletonLoader.classList.remove('hidden');
+            skeletonLoader.classList.add('flex');
+            notFoundCard.classList.add('hidden');
+            notFoundCard.classList.remove('flex');
+            dataView.classList.add('hidden');
+            dataView.classList.remove('flex');
 
-        // FAST FETCH WITH ABORT CONTROLLER & CORS PROXY FALLBACK
-        async function fetchVehicleData(regNo) {
-            const primaryEndpoint = `https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=${encodeURIComponent(regNo)}`;
-            
-            // Attempt 1: Direct fetch with 3.5s timeout
-            const controller1 = new AbortController();
-            const timeout1 = setTimeout(() => controller1.abort(), 3500);
-
-            try {
-                const response = await fetch(primaryEndpoint, {
-                    signal: controller1.signal,
-                    headers: { 'Accept': 'application/json' }
-                });
-                clearTimeout(timeout1);
-                if (response.ok) {
-                    const data = await response.json();
-                    return data;
-                }
-            } catch (e) {
-                clearTimeout(timeout1);
-                console.warn("Direct API call failed or timed out. Retrying via CORS Proxy...");
-            }
-
-            // Attempt 2: Fallback via CORS Proxy
-            const proxyEndpoint = `https://corsproxy.io/?${encodeURIComponent(primaryEndpoint)}`;
-            const controller2 = new AbortController();
-            const timeout2 = setTimeout(() => controller2.abort(), 3500);
-
-            try {
-                const response2 = await fetch(proxyEndpoint, { signal: controller2.signal });
-                clearTimeout(timeout2);
-                if (response2.ok) {
-                    const data = await response2.json();
-                    return data;
-                }
-            } catch (err) {
-                clearTimeout(timeout2);
-                console.error("CORS Proxy fetch also failed:", err);
-            }
-
-            return null;
-        }
-
-        // DISPLAY POPULATE LOGIC
-        function populateVehicleUI(data) {
-            // Traverse potential JSON structure
-            const signzy = data?.meta_data?.signzy_response?.result || {};
-            const custDetails = data?.customer_details || {};
-            const vehDetails = data?.vehicle_details || {};
-            const nomineeDetails = data?.nominee_details || {};
-            const commAddress = custDetails?.communication_address || {};
-
-            // Reg No & Status
-            const regNo = safeVal(signzy.regNo || data?.registration_number);
-            const status = safeVal(signzy.status, "ACTIVE");
-            const vClass = safeVal(signzy.class || vehDetails.vehicle_type);
-            const fuelType = safeVal(signzy.type || signzy.vehicleFuelType);
-
-            // Manufacturer & Model
-            const manufacturer = safeVal(signzy.vehicleManufacturerName);
-            const model = safeVal(signzy.model);
-
-            // Check if valid data returned
-            if (regNo === "NA" && manufacturer === "NA" && model === "NA" && !data?.customer_details) {
-                return false;
-            }
-
-            // Hero Banner Card
-            document.getElementById('hero-reg-no').innerText = regNo;
-            document.getElementById('hero-status-badge').innerText = status;
-            document.getElementById('hero-class-badge').innerText = vClass;
-            document.getElementById('hero-fuel-badge').innerText = fuelType;
-            
-            document.getElementById('hero-manufacturer').innerText = manufacturer;
-            document.getElementById('hero-model').innerText = model;
-
-            // Card 1: Owner & Registration Details
-            const ownerName = safeVal(custDetails.full_name || signzy.owner);
-            const fatherName = safeVal(signzy.ownerFatherName || nomineeDetails.name);
-            const ownerCount = safeVal(signzy.ownerCount);
-            
-            const rtoCode = safeVal(signzy.rtoCode || data?.rb_rto_code, "");
-            const rtoAuth = safeVal(signzy.regAuthority);
-            const rtoDisplay = rtoCode ? `${rtoAuth} (${rtoCode})` : rtoAuth;
-
-            const regDate = safeVal(vehDetails.registration_date || signzy.regDate);
-            const rcExpiry = signzy.rcExpiryDate || signzy.rcUpto || vehDetails.rc_expiry_date;
-
-            document.getElementById('c1-owner').innerText = ownerName;
-            document.getElementById('c1-father').innerText = fatherName;
-            document.getElementById('c1-owner-count').innerText = ownerCount;
-            document.getElementById('c1-rto').innerText = rtoDisplay;
-            document.getElementById('c1-reg-date').innerText = regDate;
-            document.getElementById('c1-rc-expiry').innerHTML = formatDateWithHighlight(rcExpiry);
-            
-            const commAddrStr = safeVal(commAddress.address_line || commAddress.complete_address || signzy.splitAddress?.addressLine);
-            const permAddrStr = safeVal(signzy.permanentAddress || signzy.splitAddress?.permanentAddress);
-            document.getElementById('c1-comm-addr').innerText = commAddrStr;
-            document.getElementById('c1-perm-addr').innerText = permAddrStr;
-
-            // Card 2: Technical Specifications
-            const engine = safeVal(data?.engine_number || signzy.engine);
-            const chassis = safeVal(data?.chassis_number || signzy.chassis);
-            const category = safeVal(signzy.class || vehDetails.vehicle_type);
-            const norms = safeVal(signzy.normsType);
-            const cc = safeVal(signzy.vehicleCubicCapacity);
-            const cylinders = safeVal(signzy.vehicleCylindersNo);
-            const seating = safeVal(signzy.vehicleSeatCapacity);
-            
-            const unladen = safeVal(signzy.unladenWeight);
-            const gross = safeVal(signzy.grossVehicleWeight);
-            const weightStr = (unladen !== "NA" || gross !== "NA") ? `${unladen} kg / ${gross} kg` : "NA";
-
-            const mfgMonth = data?.manufactured_month;
-            const mfgYear = data?.manufactured_year;
-            let mfgStr = "NA";
-            if (mfgMonth && mfgYear) {
-                mfgStr = `${mfgMonth}/${mfgYear}`;
-            } else {
-                mfgStr = safeVal(signzy.vehicleManufacturingMonthYear);
-            }
-
-            document.getElementById('c2-engine').innerText = engine;
-            document.getElementById('c2-chassis').innerText = chassis;
-            document.getElementById('c2-category').innerText = category;
-            document.getElementById('c2-norms').innerText = norms;
-            document.getElementById('c2-cc').innerText = cc;
-            document.getElementById('c2-cylinders').innerText = cylinders;
-            document.getElementById('c2-seating').innerText = seating;
-            document.getElementById('c2-weight').innerText = weightStr;
-            document.getElementById('c2-mfg-date').innerText = mfgStr;
-
-            // Card 3: Insurance & Compliance Status
-            const insurer = safeVal(signzy.vehicleInsuranceCompanyName);
-            const policyNo = safeVal(data?.previous_policy_number || signzy.vehicleInsurancePolicyNumber);
-            const insExpiry = data?.previous_policy_exp_date || signzy.vehicleInsuranceUpto;
-            
-            const puccNo = safeVal(signzy.puccNumber);
-            const puccUpto = signzy.puccUpto;
-            const taxUpto = safeVal(signzy.vehicleTaxUpto);
-
-            document.getElementById('c3-insurer').innerText = insurer;
-            document.getElementById('c3-policy-no').innerText = policyNo;
-            document.getElementById('c3-ins-expiry').innerHTML = formatDateWithHighlight(insExpiry);
-            document.getElementById('c3-pucc-no').innerText = puccNo;
-            document.getElementById('c3-pucc-upto').innerHTML = formatDateWithHighlight(puccUpto);
-            document.getElementById('c3-tax-upto').innerText = taxUpto;
-
-            // Card 4: Finance & Banking Details
-            const isFinanced = vehDetails.is_vehicle_financed;
-            const financerName = safeVal(signzy.rcFinancer);
-
-            const financeContainer = document.getElementById('c4-finance-status');
-            if (isFinanced === true || (financerName !== "NA" && financerName !== "")) {
-                financeContainer.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-cyan-950/80 text-cyan-400 border border-cyan-500/30">FINANCED</span>`;
-            } else {
-                financeContainer.innerHTML = `<span class="px-3 py-1 rounded-full text-xs font-bold bg-slate-800 text-slate-300 border border-slate-700/50">CASH / NO FINANCE</span>`;
-            }
-            document.getElementById('c4-financer').innerText = financerName;
-
-            return true;
-        }
-
-        // MAIN SEARCH HANDLER
-        async function handleSearch(event) {
-            event.preventDefault();
-
-            if (cooldownActive) return;
-
-            const inputEl = document.getElementById('reg-input');
-            const regNo = inputEl.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
-
-            if (!regNo) {
-                inputEl.focus();
-                return;
-            }
-
-            // Start Cooldown
             startCooldown();
 
-            // UI Elements
-            const skeleton = document.getElementById('skeleton-loader');
-            const notFound = document.getElementById('not-found-card');
-            const results = document.getElementById('results-container');
+            const targetUrl = `https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=${regNo}`;
+            const proxyUrl = `https://corsproxy.io/?${encodeURIComponent(targetUrl)}`;
 
-            // Hide previous results / error, show skeleton
-            results.classList.add('hidden');
-            notFound.classList.add('hidden');
-            skeleton.classList.remove('hidden');
+            let data = null;
 
-            // Fetch Data
-            const responseData = await fetchVehicleData(regNo);
+            // Attempt Fast Fetch with 3.5s timeout
+            try {
+                const controller = new AbortController();
+                const timeoutId = setTimeout(() => controller.abort(), 3500);
+
+                const response = await fetch(targetUrl, {
+                    method: 'GET',
+                    signal: controller.signal,
+                    headers: { 'ngrok-skip-browser-warning': 'true' }
+                });
+                clearTimeout(timeoutId);
+
+                if (response.ok) {
+                    data = await response.json();
+                }
+            } catch (err) {
+                console.warn('Direct fetch failed/timed out. Attempting CORS proxy fallback...');
+            }
+
+            // Fallback via CORS Proxy if direct fetch didn't return data
+            if (!data) {
+                try {
+                    const response = await fetch(proxyUrl, { method: 'GET' });
+                    if (response.ok) {
+                        data = await response.json();
+                    }
+                } catch (err) {
+                    console.error('CORS Proxy fetch error:', err);
+                }
+            }
 
             // Hide Skeleton
-            skeleton.classList.add('hidden');
+            skeletonLoader.classList.add('hidden');
+            skeletonLoader.classList.remove('flex');
 
-            if (responseData) {
-                const success = populateVehicleUI(responseData);
-                if (success) {
-                    results.classList.remove('hidden');
-                    // Re-initialize Lucide Icons for rendered content
-                    lucide.createIcons();
-                } else {
-                    notFound.classList.remove('hidden');
-                }
+            // Validate Data Output
+            if (data && (data.meta_data || data.customer_details || data.vehicle_details || data.registration_number)) {
+                renderData(data, regNo);
+                dataView.classList.remove('hidden');
+                dataView.classList.add('flex');
             } else {
-                notFound.classList.remove('hidden');
+                notFoundCard.classList.remove('hidden');
+                notFoundCard.classList.add('flex');
             }
+
+            lucide.createIcons();
+        }
+
+        // Render Data into UI
+        function renderData(data, searchedReg) {
+            const res = getNestedVal(data, 'meta_data.signzy_response.result') || {};
+            const cust = data.customer_details || {};
+            const veh = data.vehicle_details || {};
+
+            // HERO BANNER CARDS:
+            // Box 1: Manufacturer
+            const manufacturer = val(res.vehicleManufacturerName || res.manufacturer, 'NA');
+            document.getElementById('heroManufacturer').textContent = manufacturer;
+
+            // Box 2: Model
+            const model = val(res.model, 'NA');
+            document.getElementById('heroModel').textContent = model;
+
+            // Registration Number Badge
+            const displayRegNo = val(res.regNo || data.registration_number || searchedReg, 'NA');
+            document.getElementById('heroRegNo').textContent = displayRegNo;
+
+            // Status Badge
+            const status = val(res.status, 'ACTIVE').toUpperCase();
+            const heroStatusBadge = document.getElementById('heroStatusBadge');
+            if (status === 'ACTIVE') {
+                heroStatusBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-xl border flex items-center gap-1.5 bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+                heroStatusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span> ACTIVE`;
+            } else {
+                heroStatusBadge.className = 'text-xs font-bold px-3 py-1.5 rounded-xl border flex items-center gap-1.5 bg-red-500/10 text-red-400 border-red-500/30';
+                heroStatusBadge.innerHTML = `<span class="w-2 h-2 rounded-full bg-red-400"></span> ${status}`;
+            }
+
+            // Vehicle Class & Fuel Type
+            document.getElementById('heroClassBadge').textContent = val(res.class || veh.vehicle_type, 'CLASS NA');
+            document.getElementById('heroFuelBadge').textContent = val(res.type || res.fuelType || veh.fuel_type, 'FUEL NA');
+
+            // CARD 1: Owner & Registration Details
+            document.getElementById('ownerName').textContent = val(cust.full_name || res.owner);
+            document.getElementById('ownerFather').textContent = val(res.ownerFatherName || getNestedVal(data, 'nominee_details.name'));
+            document.getElementById('ownerCount').textContent = val(res.ownerCount);
+            
+            const rtoCode = val(res.rtoCode || data.rb_rto_code, '');
+            const rtoName = val(res.regAuthority, '');
+            document.getElementById('regAuthority').textContent = rtoName ? (rtoCode ? `${rtoName} (${rtoCode})` : rtoName) : 'NA';
+
+            const regDateVal = val(veh.registration_date || res.regDate, 'NA');
+            document.getElementById('regDate').innerHTML = formatAndHighlightDate(regDateVal);
+
+            const rcExpiryVal = val(res.rcExpiryDate, 'NA');
+            document.getElementById('rcExpiry').innerHTML = formatAndHighlightDate(rcExpiryVal);
+
+            document.getElementById('commAddress').textContent = val(getNestedVal(cust, 'communication_address.address_line'));
+            document.getElementById('permAddress').textContent = val(res.permanentAddress);
+
+            // CARD 2: Technical Specifications
+            document.getElementById('engineNo').textContent = val(data.engine_number || res.engine);
+            document.getElementById('chassisNo').textContent = val(data.chassis_number || res.chassis);
+            document.getElementById('vehicleCategory').textContent = val(res.class || veh.vehicle_type);
+            document.getElementById('normsType').textContent = val(res.normsType);
+            document.getElementById('cubicCapacity').textContent = val(res.vehicleCubicCapacity ? `${res.vehicleCubicCapacity} cc` : null);
+            document.getElementById('cylinderCount').textContent = val(res.vehicleCylindersNo);
+            document.getElementById('seatingCapacity').textContent = val(res.vehicleSeatCapacity);
+
+            const unladen = res.unladenWeight ? `${res.unladenWeight} kg` : null;
+            const gross = res.grossVehicleWeight ? `${res.grossVehicleWeight} kg` : null;
+            document.getElementById('weightDetails').textContent = (unladen || gross) ? `${unladen || 'NA'} / ${gross || 'NA'}` : 'NA';
+
+            const mfgM = data.manufactured_month;
+            const mfgY = data.manufactured_year;
+            document.getElementById('mfgDate').textContent = (mfgM && mfgY) ? `${mfgM}/${mfgY}` : val(res.vehicleManufacturingMonthYear);
+
+            // CARD 3: Insurance & Compliance Status
+            document.getElementById('insuranceProvider').textContent = val(res.vehicleInsuranceCompanyName);
+            document.getElementById('insurancePolicy').textContent = val(data.previous_policy_number || res.vehicleInsurancePolicyNumber);
+
+            const insExpVal = val(data.previous_policy_exp_date || res.vehicleInsuranceUpto, 'NA');
+            document.getElementById('insuranceExpiry').innerHTML = formatAndHighlightDate(insExpVal);
+
+            document.getElementById('puccNo').textContent = val(res.puccNumber);
+            const puccUptoVal = val(res.puccUpto, 'NA');
+            document.getElementById('puccUpto').innerHTML = formatAndHighlightDate(puccUptoVal);
+
+            const taxUptoVal = val(res.vehicleTaxUpto, 'NA');
+            document.getElementById('taxStatus').innerHTML = formatAndHighlightDate(taxUptoVal);
+
+            // CARD 4: Finance & Banking Details
+            const isFinanced = veh.is_vehicle_financed || res.rcFinancer;
+            const financeStatusElem = document.getElementById('financeStatus');
+            if (isFinanced && isFinanced !== 'false' && isFinanced !== false) {
+                financeStatusElem.textContent = 'FINANCED';
+                financeStatusElem.className = 'text-xs font-bold px-3 py-1 rounded-full border bg-emerald-500/10 text-emerald-400 border-emerald-500/30';
+            } else {
+                financeStatusElem.textContent = 'CASH / NO FINANCE';
+                financeStatusElem.className = 'text-xs font-bold px-3 py-1 rounded-full border bg-slate-800 text-slate-300 border-slate-700';
+            }
+
+            document.getElementById('financerName').textContent = val(res.rcFinancer);
         }
     </script>
 </body>
