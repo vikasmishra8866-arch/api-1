@@ -3,9 +3,9 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Vehicle Lookup Gateway</title>
+  <title>Vehicle Details Lookup - Gateway 1</title>
   
-  <!-- Google Fonts: Plus Jakarta Sans -->
+  <!-- Google Fonts: Plus Jakarta Sans & JetBrains Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;600;700&display=swap" rel="stylesheet">
@@ -30,13 +30,13 @@
             emeraldGlow: '#10b981',
           },
           animation: {
-            'pulse-glow': 'pulseGlow 2s infinite ease-in-out',
+            'pulse-glow': 'pulseGlow 3s infinite ease-in-out',
             'shimmer': 'shimmer 1.5s infinite linear',
           },
           keyframes: {
             pulseGlow: {
-              '0%, 100%': { opacity: 0.4, transform: 'scale(1)' },
-              '50%': { opacity: 0.8, transform: 'scale(1.05)' },
+              '0%, 100%': { opacity: 0.3, transform: 'scale(1)' },
+              '50%': { opacity: 0.7, transform: 'scale(1.08)' },
             },
             shimmer: {
               '0%': { backgroundPosition: '-200% 0' },
@@ -75,13 +75,13 @@
     }
 
     .glass-input {
-      background: rgba(6, 8, 13, 0.7);
+      background: rgba(6, 8, 13, 0.75);
       border: 1px solid rgba(6, 182, 212, 0.3);
       backdrop-filter: blur(12px);
     }
     .glass-input:focus-within {
       border-color: #06b6d4;
-      box-shadow: 0 0 20px rgba(6, 182, 212, 0.3);
+      box-shadow: 0 0 25px rgba(6, 182, 212, 0.3);
     }
 
     /* Shimmer Skeleton */
@@ -111,11 +111,11 @@
 
   <!-- Ambient Dynamic Background Light Glows -->
   <div class="fixed top-[-10%] left-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-glow-cyan pointer-events-none z-0 rounded-full animate-pulse-glow"></div>
-  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-glow-emerald pointer-events-none z-0 rounded-full animate-pulse-glow" style="animation-delay: 1s;"></div>
+  <div class="fixed bottom-[-10%] right-[-10%] w-[50vw] h-[50vw] max-w-[600px] max-h-[600px] bg-glow-emerald pointer-events-none z-0 rounded-full animate-pulse-glow" style="animation-delay: 1.5s;"></div>
 
   <!-- TOP CORNER SERVER STATUS INDICATOR -->
   <div class="fixed top-5 right-5 z-50">
-    <div class="glass-panel py-2 px-3.5 rounded-full flex items-center space-x-2.5 shadow-lg border border-cyan-500/30 text-xs font-medium tracking-wide" title="Server 1 Gateway Status">
+    <div class="glass-panel py-2 px-3.5 rounded-full flex items-center space-x-2.5 shadow-lg border border-cyan-500/30 text-xs font-medium tracking-wide" title="Server 1 Gateway">
       <span class="relative flex h-2.5 w-2.5">
         <span id="status-pulse" class="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
         <span id="status-dot" class="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
@@ -169,17 +169,14 @@
     <!-- SKELETON LOADER CONTAINER -->
     <div id="skeleton-container" class="w-full space-y-6 hidden">
       <!-- Hero Skeleton -->
-      <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-4">
+      <div class="glass-panel p-6 sm:p-8 rounded-3xl space-y-5">
         <div class="flex flex-wrap justify-between items-start gap-4">
-          <div class="space-y-3 w-2/3">
-            <div class="h-8 w-3/4 skeleton rounded-xl"></div>
-            <div class="h-6 w-1/3 skeleton rounded-lg"></div>
-          </div>
-          <div class="h-10 w-28 skeleton rounded-full"></div>
+          <div class="h-10 w-44 skeleton rounded-xl"></div>
+          <div class="h-8 w-24 skeleton rounded-full"></div>
         </div>
-        <div class="flex gap-2 pt-2">
-          <div class="h-6 w-20 skeleton rounded-md"></div>
-          <div class="h-6 w-20 skeleton rounded-md"></div>
+        <div class="space-y-3 pt-2">
+          <div class="h-16 w-full skeleton rounded-2xl"></div>
+          <div class="h-16 w-full skeleton rounded-2xl"></div>
         </div>
       </div>
 
@@ -224,31 +221,56 @@
       <div class="glass-panel p-6 sm:p-8 rounded-3xl relative overflow-hidden border-cyan-500/30">
         <div class="absolute -right-10 -top-10 w-40 h-40 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none"></div>
         
-        <div class="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
-          <div class="space-y-3">
+        <div class="flex flex-col space-y-6 relative z-10">
+          
+          <!-- Top Row: Registration Badge + Badges -->
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div class="flex flex-wrap items-center gap-3">
-              <span id="hero-reg" class="font-mono text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-wider px-3.5 py-1 bg-cyan-950/50 border border-cyan-500/30 rounded-xl shadow-inner">
+              <span id="hero-reg" class="font-mono text-2xl sm:text-3xl font-extrabold text-cyan-400 tracking-wider px-4 py-1.5 bg-cyan-950/60 border border-cyan-500/40 rounded-2xl shadow-[0_0_15px_rgba(6,182,212,0.15)]">
                 NA
               </span>
-              <span id="hero-status" class="px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+              <span id="hero-status" class="px-3.5 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
                 ACTIVE
               </span>
             </div>
-            <h1 id="hero-title" class="text-2xl sm:text-4xl font-extrabold text-white tracking-tight">
-              NA
-            </h1>
+
+            <div class="flex flex-wrap gap-2 items-center">
+              <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-slate-900/80 border border-slate-700/60">
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Class:</span>
+                <span id="hero-class" class="text-xs font-bold text-slate-200">NA</span>
+              </div>
+              <div class="flex items-center gap-2 px-3 py-1 rounded-xl bg-emerald-950/40 border border-emerald-500/20">
+                <span class="text-[10px] text-slate-400 uppercase tracking-widest font-semibold">Fuel:</span>
+                <span id="hero-fuel" class="text-xs font-bold text-emerald-400">NA</span>
+              </div>
+            </div>
           </div>
 
-          <div class="flex flex-wrap md:flex-col gap-2 items-start md:items-end justify-start">
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Class:</span>
-              <span id="hero-class" class="text-xs font-bold text-slate-200 px-2.5 py-1 rounded-lg bg-slate-800/80 border border-slate-700">NA</span>
+          <!-- DEDICATED MANUFACTURER & MODEL GLASS BOXES -->
+          <div class="grid grid-cols-1 gap-3.5 pt-1">
+            <!-- Box 1: Manufacturer -->
+            <div class="p-4 rounded-2xl bg-cyan-950/20 border border-cyan-500/20 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-1 shadow-sm">
+              <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-2 shrink-0">
+                <i data-lucide="factory" class="w-4 h-4"></i>
+                Manufacturer
+              </span>
+              <span id="hero-manufacturer" class="text-base sm:text-lg font-extrabold text-white sm:text-right break-words">
+                NA
+              </span>
             </div>
-            <div class="flex items-center gap-2">
-              <span class="text-xs text-slate-400 uppercase tracking-widest font-semibold">Fuel:</span>
-              <span id="hero-fuel" class="text-xs font-bold text-emerald-400 px-2.5 py-1 rounded-lg bg-emerald-950/40 border border-emerald-500/20">NA</span>
+
+            <!-- Box 2: Model -->
+            <div class="p-4 rounded-2xl bg-slate-900/50 border border-slate-700/40 backdrop-blur-md flex flex-col sm:flex-row sm:items-center justify-between gap-1 shadow-sm">
+              <span class="text-xs font-bold text-slate-400 uppercase tracking-wider flex items-center gap-2 shrink-0">
+                <i data-lucide="car" class="w-4 h-4 text-cyan-400"></i>
+                Model
+              </span>
+              <span id="hero-model" class="text-base sm:text-lg font-extrabold text-slate-100 sm:text-right break-words">
+                NA
+              </span>
             </div>
           </div>
+
         </div>
       </div>
 
@@ -290,7 +312,7 @@
               </div>
               <div class="flex flex-col">
                 <span class="text-xs text-slate-400 font-medium">RC Expiry Date</span>
-                <span id="c1-rc-exp" class="text-slate-200 font-mono mt-0.5">NA</span>
+                <div id="c1-rc-exp" class="mt-0.5 font-mono">NA</div>
               </div>
             </div>
             <div class="flex flex-col">
@@ -380,7 +402,7 @@
               </div>
               <div class="flex flex-col">
                 <span class="text-xs text-slate-400 font-medium">Insurance Expiry</span>
-                <span id="c3-ins-exp" class="text-emerald-400 font-mono font-semibold mt-0.5">NA</span>
+                <div id="c3-ins-exp" class="mt-0.5 font-mono">NA</div>
               </div>
             </div>
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -390,7 +412,7 @@
               </div>
               <div class="flex flex-col">
                 <span class="text-xs text-slate-400 font-medium">PUCC Valid Upto</span>
-                <span id="c3-pucc-exp" class="text-slate-200 font-mono mt-0.5">NA</span>
+                <div id="c3-pucc-exp" class="mt-0.5 font-mono">NA</div>
               </div>
             </div>
             <div class="flex flex-col">
@@ -448,6 +470,49 @@
     const statusPulse = document.getElementById('status-pulse');
     const statusDot = document.getElementById('status-dot');
 
+    // DYNAMIC DATE COLOR FORMATTING UTILITY
+    function formatDateWithHighlight(dateStr) {
+      if (!dateStr || dateStr === 'NA' || dateStr === null || dateStr === undefined) {
+        return '<span class="text-slate-300">NA</span>';
+      }
+
+      let parsedDate = null;
+      const str = String(dateStr).trim();
+
+      // Try DD/MM/YYYY or DD-MM-YYYY
+      if (/^\d{1,2}[\/-]\d{1,2}[\/-]\d{4}$/.test(str)) {
+        const parts = str.split(/[\/-]/);
+        parsedDate = new Date(parts[2], parts[1] - 1, parts[0]);
+      } 
+      // Try YYYY-MM-DD or YYYY/MM/DD
+      else if (/^\d{4}[\/-]\d{1,2}[\/-]\d{1,2}$/.test(str)) {
+        const parts = str.split(/[\/-]/);
+        parsedDate = new Date(parts[0], parts[1] - 1, parts[2]);
+      } 
+      // Fallback standard parse
+      else {
+        const t = Date.parse(str);
+        if (!isNaN(t)) {
+          parsedDate = new Date(t);
+        }
+      }
+
+      if (!parsedDate || isNaN(parsedDate.getTime())) {
+        return `<span class="text-slate-200">${str}</span>`;
+      }
+
+      // Zero out time components for date-only comparison
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      parsedDate.setHours(0, 0, 0, 0);
+
+      if (parsedDate >= today) {
+        return `<span class="inline-block text-emerald-400 font-bold bg-emerald-950/40 px-2 py-0.5 rounded border border-emerald-500/30 shadow-[0_0_10px_rgba(16,185,129,0.15)]">${str}</span>`;
+      } else {
+        return `<span class="text-slate-300 font-medium">${str}</span>`;
+      }
+    }
+
     // Input Sanitization & Real-time Formatting
     inputEl.addEventListener('input', (e) => {
       let val = e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, '');
@@ -471,14 +536,13 @@
         const controller = new AbortController();
         const timeoutId = setTimeout(() => controller.abort(), 3000);
         
-        // Simple HEAD/GET test
         const targetUrl = 'https://unsalubriously-unfragrant-rosetta.ngrok-free.dev/api/vehicle-details-only?regn_no=TEST';
         await fetch(targetUrl, { method: 'GET', signal: controller.signal, headers: { 'ngrok-skip-browser-warning': 'true' } });
         clearTimeout(timeoutId);
         
         setServerStatus(true);
       } catch (err) {
-        // Fallback to proxy check if direct fails
+        // Fallback proxy check if direct call fails
         try {
           const controller = new AbortController();
           const timeoutId = setTimeout(() => controller.abort(), 3000);
@@ -525,14 +589,13 @@
       }, 1000);
     }
 
-    // Main Search Action
+    // Main Search Handler
     async function handleSearch(event) {
       event.preventDefault();
       const regNo = inputEl.value.trim().toUpperCase().replace(/[^A-Z0-9]/g, '');
 
       if (!regNo) return;
 
-      // Start UI loading states
       startCooldown();
       showLoadingState();
 
@@ -542,15 +605,15 @@
       let data = null;
 
       try {
-        // Attempt Direct Fetch with 3.5s Timeout
+        // Direct Fetch with 3.5s Timeout
         data = await fetchWithTimeout(rawEndpoint, 3500);
       } catch (directErr) {
-        console.warn('Direct API call failed or timed out. Attempting via CORS Proxy...');
+        console.warn('Direct fetch failed/timed out. Trying CORS proxy...');
         try {
-          // Attempt Proxy Fetch
+          // Fallback Proxy Fetch
           data = await fetchWithTimeout(proxyEndpoint, 5000);
         } catch (proxyErr) {
-          console.error('Proxy API call failed:', proxyErr);
+          console.error('Proxy fetch failed:', proxyErr);
         }
       }
 
@@ -581,18 +644,16 @@
       return await response.json();
     }
 
-    // Validate Response Data
+    // Validate API Response
     function isDataValid(data) {
-      if (!data) return false;
-      if (typeof data !== 'object') return false;
-      // Basic check to confirm non-empty structure
+      if (!data || typeof data !== 'object') return false;
       const hasMeta = data.meta_data && data.meta_data.signzy_response && data.meta_data.signzy_response.result;
       const hasCustomer = data.customer_details;
       const hasVehicle = data.vehicle_details;
       return !!(hasMeta || hasCustomer || hasVehicle || data.registration_number);
     }
 
-    // UI State Switches
+    // UI View State Toggles
     function showLoadingState() {
       resultsContainer.classList.add('hidden');
       errorCard.classList.add('hidden');
@@ -606,7 +667,7 @@
       errorCard.classList.remove('hidden');
     }
 
-    // Deep Safe Property Extractor
+    // Safe Deep Extraction Utility
     function getSafe(fn, fallback = "NA") {
       try {
         const val = fn();
@@ -619,38 +680,40 @@
       }
     }
 
-    // Render Data to UI
+    // Map & Display Data
     function renderVehicleData(data, searchReg) {
       const res = getSafe(() => data.meta_data.signzy_response.result, {});
       const cust = getSafe(() => data.customer_details, {});
       const veh = getSafe(() => data.vehicle_details, {});
       const nom = getSafe(() => data.nominee_details, {});
 
-      // Hero Banner
-      const manufacturer = getSafe(() => res.vehicleManufacturerName, '');
-      const model = getSafe(() => res.model, '');
-      const fullTitle = `${manufacturer} ${model}`.trim() || 'Vehicle Record';
+      // HERO BANNER & GLASS BOXES
+      const manufacturer = getSafe(() => res.vehicleManufacturerName, 'NA');
+      const model = getSafe(() => res.model, 'NA');
       
       const regNo = getSafe(() => res.regNo, getSafe(() => data.registration_number, searchReg));
       const status = getSafe(() => res.status, 'Active');
       const vClass = getSafe(() => res.class, getSafe(() => veh.vehicle_type, 'NA'));
       const fuel = getSafe(() => res.type, getSafe(() => res.fuelType, 'NA'));
 
-      document.getElementById('hero-title').textContent = fullTitle;
       document.getElementById('hero-reg').textContent = regNo;
       document.getElementById('hero-status').textContent = status;
       document.getElementById('hero-class').textContent = vClass;
       document.getElementById('hero-fuel').textContent = fuel;
 
-      // Status color toggle
+      // Manufacturer & Model Box Mapping
+      document.getElementById('hero-manufacturer').textContent = manufacturer;
+      document.getElementById('hero-model').textContent = model;
+
+      // Status Badge Style
       const statusEl = document.getElementById('hero-status');
       if (status.toUpperCase().includes('ACTIVE') && !status.toUpperCase().includes('INACTIVE')) {
-        statusEl.className = "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
+        statusEl.className = "px-3.5 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-emerald-500/20 text-emerald-400 border border-emerald-500/30";
       } else {
-        statusEl.className = "px-3 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30";
+        statusEl.className = "px-3.5 py-1 text-xs font-bold rounded-full uppercase tracking-wider bg-red-500/20 text-red-400 border border-red-500/30";
       }
 
-      // Card 1: Owner & Registration
+      // CARD 1: Owner & Registration
       document.getElementById('c1-owner').textContent = getSafe(() => cust.full_name, getSafe(() => res.owner, 'NA'));
       document.getElementById('c1-father').textContent = getSafe(() => res.ownerFatherName, getSafe(() => nom.name, 'NA'));
       document.getElementById('c1-owner-count').textContent = getSafe(() => res.ownerCount, 'NA');
@@ -661,11 +724,15 @@
       document.getElementById('c1-rto').textContent = rtoCombined;
 
       document.getElementById('c1-reg-date').textContent = getSafe(() => veh.registration_date, getSafe(() => res.regDate, 'NA'));
-      document.getElementById('c1-rc-exp').textContent = getSafe(() => res.rcExpiryDate, 'NA');
+      
+      // Highlight Expiry Dates
+      const rcExpRaw = getSafe(() => res.rcExpiryDate, 'NA');
+      document.getElementById('c1-rc-exp').innerHTML = formatDateWithHighlight(rcExpRaw);
+
       document.getElementById('c1-comm-addr').textContent = getSafe(() => cust.communication_address.address_line, 'NA');
       document.getElementById('c1-perm-addr').textContent = getSafe(() => res.permanentAddress, 'NA');
 
-      // Card 2: Technical Specifications
+      // CARD 2: Technical Specifications
       document.getElementById('c2-engine').textContent = getSafe(() => data.engine_number, getSafe(() => res.engine, 'NA'));
       document.getElementById('c2-chassis').textContent = getSafe(() => data.chassis_number, getSafe(() => res.chassis, 'NA'));
       document.getElementById('c2-category').textContent = vClass;
@@ -684,15 +751,23 @@
       const mfgStr = (mMonth || mYear) ? `${mMonth}/${mYear}` : getSafe(() => res.vehicleManufacturingMonthYear, 'NA');
       document.getElementById('c2-mfg').textContent = mfgStr;
 
-      // Card 3: Insurance & Compliance Status
+      // CARD 3: Insurance & Compliance Status
       document.getElementById('c3-ins-provider').textContent = getSafe(() => res.vehicleInsuranceCompanyName, 'NA');
       document.getElementById('c3-ins-policy').textContent = getSafe(() => data.previous_policy_number, getSafe(() => res.vehicleInsurancePolicyNumber, 'NA'));
-      document.getElementById('c3-ins-exp').textContent = getSafe(() => data.previous_policy_exp_date, getSafe(() => res.vehicleInsuranceUpto, 'NA'));
+      
+      // Insurance Expiry Date with Highlight
+      const insExpRaw = getSafe(() => data.previous_policy_exp_date, getSafe(() => res.vehicleInsuranceUpto, 'NA'));
+      document.getElementById('c3-ins-exp').innerHTML = formatDateWithHighlight(insExpRaw);
+
       document.getElementById('c3-pucc-num').textContent = getSafe(() => res.puccNumber, 'NA');
-      document.getElementById('c3-pucc-exp').textContent = getSafe(() => res.puccUpto, 'NA');
+      
+      // PUCC Valid Upto with Highlight
+      const puccExpRaw = getSafe(() => res.puccUpto, 'NA');
+      document.getElementById('c3-pucc-exp').innerHTML = formatDateWithHighlight(puccExpRaw);
+
       document.getElementById('c3-tax-exp').textContent = getSafe(() => res.vehicleTaxUpto, 'NA');
 
-      // Card 4: Finance & Banking Details
+      // CARD 4: Finance & Banking Details
       const isFinanced = getSafe(() => veh.is_vehicle_financed, null);
       let finStatusText = "NA";
       if (isFinanced === true || isFinanced === "true") {
@@ -707,12 +782,12 @@
       document.getElementById('c4-fin-status').textContent = finStatusText;
       document.getElementById('c4-financer').textContent = getSafe(() => res.rcFinancer, 'NA');
 
-      // Switch Visibility
+      // Switch Visibility to Active Results
       skeletonContainer.classList.add('hidden');
       errorCard.classList.add('hidden');
       resultsContainer.classList.remove('hidden');
 
-      // Refresh Lucide Icons inside rendered content
+      // Re-initialize Lucide icons for newly rendered content
       lucide.createIcons();
     }
   </script>
